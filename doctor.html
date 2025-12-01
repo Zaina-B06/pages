@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors Directory | OpenCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #dbeafe;
+            --primary-dark: #1d4ed8;
+            --secondary: #0ea5e9;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Doctors Header */
+        .doctors-header {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+            text-align: center;
+        }
+
+        .doctors-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 16px;
+        }
+
+        .doctors-header p {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Filters */
+        .filters {
+            padding: 40px 0;
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: white;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .search-box {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 16px center;
+        }
+
+        /* Doctors Grid */
+        .doctors-grid {
+            padding: 60px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .doctor-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .doctor-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary);
+            font-size: 48px;
+            border: 4px solid white;
+            box-shadow: var(--shadow);
+        }
+
+        .doctor-info h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .doctor-specialty {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .doctor-experience {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .doctor-rating {
+            color: var(--warning);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .doctor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+        }
+
+        /* Pagination */
+        .pagination {
+            padding: 40px 0 80px;
+            text-align: center;
+        }
+
+        .page-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .page-number {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .page-number:hover, .page-number.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+            text-align: center;
+        }
+
+        .copyright {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="logo-text">OpenCare</div>
+                </a>
+                <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Doctors Header -->
+    <section class="doctors-header">
+        <div class="container">
+            <h1>Find Your Doctor</h1>
+            <p>Connect with certified healthcare professionals across various specialties. Book appointments or schedule virtual consultations.</p>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-container">
+                <div class="search-box">
+                    <label>Search Doctors</label>
+                    <input type="text" placeholder="Search by name, specialty, or condition...">
+                </div>
+                <div class="filter-group">
+                    <label>Specialty</label>
+                    <select class="filter-select">
+                        <option value="">All Specialties</option>
+                        <option value="general">General Physician</option>
+                        <option value="cardio">Cardiologist</option>
+                        <option value="pedia">Pediatrician</option>
+                        <option value="derma">Dermatologist</option>
+                        <option value="neuro">Neurologist</option>
+                        <option value="ortho">Orthopedist</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Availability</label>
+                    <select class="filter-select">
+                        <option value="">Any Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="online">Online Now</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Doctors Grid -->
+    <section class="doctors-grid">
+        <div class="container">
+            <!-- Doctor 1 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. Sarah Johnson</h2>
+                    <div class="doctor-specialty">General Physician</div>
+                    <div class="doctor-experience">10+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        4.7 (120 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Specializes in internal medicine and preventive care. Available for in-person and virtual consultations.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('sarah-johnson')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('sarah-johnson')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor 2 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. Michael Chen</h2>
+                    <div class="doctor-specialty">Cardiologist</div>
+                    <div class="doctor-experience">15+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        5.0 (95 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Heart specialist with expertise in cardiovascular diseases, hypertension, and preventive cardiology.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('michael-chen')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('michael-chen')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor 3 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. Priya Sharma</h2>
+                    <div class="doctor-specialty">Pediatrician</div>
+                    <div class="doctor-experience">12+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        5.0 (210 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Children's health specialist with expertise in growth, development, and childhood illnesses.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('priya-sharma')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('priya-sharma')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor 4 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. Robert Williams</h2>
+                    <div class="doctor-specialty">Dermatologist</div>
+                    <div class="doctor-experience">8+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        4.6 (85 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Skin health specialist with expertise in dermatology, cosmetic procedures, and skin cancer screening.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('robert-williams')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('robert-williams')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor 5 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. Lisa Wang</h2>
+                    <div class="doctor-specialty">Neurologist</div>
+                    <div class="doctor-experience">14+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        4.9 (156 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Brain and nervous system specialist with expertise in neurological disorders and treatments.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('lisa-wang')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('lisa-wang')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doctor 6 -->
+            <div class="doctor-card">
+                <div class="doctor-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="doctor-info">
+                    <h2>Dr. James Miller</h2>
+                    <div class="doctor-specialty">Orthopedist</div>
+                    <div class="doctor-experience">18+ years experience</div>
+                    <div class="doctor-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        4.8 (132 reviews)
+                    </div>
+                    <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                        Bone and joint specialist with expertise in orthopedic surgery, sports injuries, and rehabilitation.
+                    </p>
+                    <div class="doctor-actions">
+                        <button class="btn btn-primary" onclick="bookConsultation('james-miller')">
+                            <i class="fas fa-calendar-alt"></i> Book
+                        </button>
+                        <button class="btn btn-outline" onclick="viewProfile('james-miller')">
+                            <i class="fas fa-user"></i> Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    <section class="pagination">
+        <div class="container">
+            <div class="page-numbers">
+                <a href="#" class="page-number">1</a>
+                <a href="#" class="page-number">2</a>
+                <a href="#" class="page-number active">3</a>
+                <a href="#" class="page-number">4</a>
+                <a href="#" class="page-number">5</a>
+            </div>
+            <button class="btn btn-outline" onclick="loadMoreDoctors()">
+                <i class="fas fa-plus"></i> Load More Doctors
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <a href="index.html" class="logo" style="justify-content: center; margin-bottom: 20px;">
+                <div class="logo-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div class="logo-text">OpenCare</div>
+            </a>
+            <p style="color: #94a3b8; max-width: 600px; margin: 0 auto;">
+                Connect with certified healthcare professionals for consultations, second opinions, and medical advice.
+            </p>
+            <div class="copyright">
+                &copy; 2023 OpenCare. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function bookConsultation(doctorId) {
+            alert(`Booking consultation with ${doctorId}. Would redirect to booking page.`);
+        }
+
+        function viewProfile(doctorId) {
+            alert(`Viewing profile of ${doctorId}. Would redirect to detailed profile page.`);
+        }
+
+        function loadMoreDoctors() {
+            alert('Loading more doctors... This would fetch additional doctor data from the server.');
+        }
+
+        // Filter functionality
+        const searchInput = document.querySelector('input[type="text"]');
+        const specialtySelect = document.querySelectorAll('.filter-select')[0];
+        const availabilitySelect = document.querySelectorAll('.filter-select')[1];
+
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const specialty = specialtySelect.value;
+            const availability = availabilitySelect.value;
+            
+            alert(`Applying filters:\nSearch: ${searchTerm}\nSpecialty: ${specialty}\nAvailability: ${availability}\n\nWould filter doctors list in real application.`);
+        }
+
+        // Debounce search
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 500);
+        });
+
+        specialtySelect.addEventListener('change', applyFilters);
+        availabilitySelect.addEventListener('change', applyFilters);
+    </script>
+</body>
+</html>
