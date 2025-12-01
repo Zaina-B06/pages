@@ -24,8 +24,9 @@
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
             --shadow: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
             --radius: 12px;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -34,12 +35,17 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             color: var(--dark);
             background-color: white;
             overflow-x: hidden;
+            position: relative;
         }
 
         .container {
@@ -54,10 +60,11 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
             z-index: 1000;
+            box-shadow: var(--shadow);
         }
 
         .navbar {
@@ -157,6 +164,7 @@
 
         .btn-login:hover {
             background: var(--gray-light);
+            transform: translateY(-1px);
         }
 
         .btn-primary {
@@ -170,29 +178,10 @@
             box-shadow: var(--shadow-lg);
         }
 
-        /* Main Content Area */
+        /* Main Content */
         .main-content {
-            min-height: calc(100vh - 80px);
+            min-height: 100vh;
             padding-top: 80px;
-        }
-
-        /* Home Page */
-        #homePage {
-            display: block;
-        }
-
-        .page-section {
-            display: none;
-        }
-
-        .page-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Hero Section */
@@ -203,11 +192,24 @@
             overflow: hidden;
         }
 
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            top: -300px;
+            right: -200px;
+        }
+
         .hero-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-text {
@@ -269,6 +271,7 @@
 
         .btn-outline:hover {
             background: var(--primary-light);
+            transform: translateY(-2px);
         }
 
         .hero-image {
@@ -278,7 +281,7 @@
         .hero-image img {
             width: 100%;
             border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             transform: perspective(1000px) rotateY(-10deg);
             transition: var(--transition);
         }
@@ -294,7 +297,7 @@
             background: white;
             padding: 16px;
             border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -364,8 +367,25 @@
 
         .service-card:hover {
             transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             border-color: transparent;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
         }
 
         .service-icon {
@@ -396,7 +416,7 @@
         /* Doctors Section */
         .doctors-section {
             padding: 100px 0;
-            background: var(--gray-light);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
         .doctors-grid {
@@ -413,11 +433,12 @@
             text-align: center;
             border: 1px solid var(--border);
             transition: var(--transition);
+            box-shadow: var(--shadow);
         }
 
         .doctor-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
         }
 
         .doctor-icon {
@@ -432,7 +453,7 @@
             color: var(--primary);
             font-size: 40px;
             border: 4px solid white;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-lg);
         }
 
         .doctor-card h3 {
@@ -463,12 +484,26 @@
         .emergency-section {
             padding: 80px 0;
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-section::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
         }
 
         .emergency-content {
             text-align: center;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .emergency h2 {
@@ -481,12 +516,13 @@
             font-size: 18px;
             color: #7f1d1d;
             margin-bottom: 32px;
+            opacity: 0.9;
         }
 
         .emergency-btn {
             background: #dc2626;
             color: white;
-            padding: 16px 40px;
+            padding: 18px 40px;
             border-radius: 12px;
             font-size: 18px;
             font-weight: 600;
@@ -496,12 +532,13 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
         }
 
         .emergency-btn:hover {
             transform: scale(1.05);
             background: #b91c1c;
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.3);
         }
 
         /* Tips Section */
@@ -523,11 +560,13 @@
             border-radius: var(--radius);
             padding: 32px;
             transition: var(--transition);
+            box-shadow: var(--shadow);
         }
 
         .tip-card:hover {
+            transform: translateY(-4px);
             border-color: var(--primary);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-xl);
         }
 
         .tip-icon {
@@ -552,58 +591,6 @@
         .tip-card p {
             color: var(--gray);
             font-size: 15px;
-        }
-
-        /* Doctors Directory Page */
-        .doctors-directory {
-            padding: 120px 0 60px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
-            min-height: 100vh;
-        }
-
-        .doctors-directory-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .doctors-directory-header h1 {
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 16px;
-        }
-
-        .doctors-directory-header p {
-            font-size: 18px;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Health Tips Directory Page */
-        .health-tips-directory {
-            padding: 120px 0 60px;
-            background: white;
-            min-height: 100vh;
-        }
-
-        .health-tips-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .health-tips-header h1 {
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 16px;
-        }
-
-        .health-tips-header p {
-            font-size: 18px;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         /* Footer */
@@ -660,6 +647,7 @@
 
         .footer-links a:hover {
             color: white;
+            transform: translateX(5px);
         }
 
         .copyright {
@@ -670,30 +658,235 @@
             font-size: 14px;
         }
 
-        /* Page Navigation */
-        .page-navigation {
+        /* MODAL OVERLAY PAGES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            width: 95%;
+            max-width: 1200px;
+            margin: 40px auto;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            max-height: 90vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--border);
+            flex-direction: column;
         }
 
-        .page-title h1 {
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .modal-header h1 {
             font-size: 36px;
-            color: var(--dark);
+            font-weight: 700;
             margin: 0;
+            color: white;
         }
 
-        .back-to-home {
-            color: var(--primary);
-            text-decoration: none;
+        .modal-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 10px;
+            max-width: 600px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 40px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Doctors Modal Specific */
+        .doctors-filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: var(--gray-light);
+            border-radius: var(--radius);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
             font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .filter-select, .search-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: var(--dark);
+            width: 100%;
+        }
+
+        .search-input {
+            padding-left: 45px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 16px center;
+        }
+
+        .doctors-modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Health Tips Modal Specific */
+        .tips-categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 100px;
+            font-weight: 500;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 8px;
-            cursor: pointer;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .featured-tip {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: var(--radius);
+            padding: 40px;
+            color: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .featured-content h2 {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .featured-content p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .featured-icon {
+            font-size: 100px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .tips-modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .tip-modal-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .tip-modal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .tip-category-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 6px 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
         }
 
         /* Responsive */
@@ -709,6 +902,15 @@
             
             .hero-actions {
                 justify-content: center;
+            }
+            
+            .doctors-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-tip {
+                grid-template-columns: 1fr;
+                text-align: center;
             }
         }
 
@@ -729,6 +931,37 @@
                 width: 100%;
                 justify-content: center;
             }
+            
+            .modal-header h1 {
+                font-size: 28px;
+            }
+            
+            .modal-header {
+                padding: 20px;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .doctors-modal-grid,
+            .tips-modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -737,7 +970,7 @@
     <header>
         <div class="container">
             <nav class="navbar">
-                <div class="logo" onclick="showPage('homePage')">
+                <div class="logo" onclick="scrollToTop()">
                     <div class="logo-icon">
                         <i class="fas fa-stethoscope"></i>
                     </div>
@@ -745,11 +978,11 @@
                 </div>
                 
                 <div class="nav-links">
-                    <a class="active" onclick="showPage('homePage')">Home</a>
-                    <a onclick="showPage('services')">Services</a>
-                    <a onclick="showPage('doctorsDirectory')">Doctors</a>
-                    <a onclick="showPage('emergency')">Emergency</a>
-                    <a onclick="showPage('healthTipsDirectory')">Health Tips</a>
+                    <a class="active" onclick="scrollToSection('home')">Home</a>
+                    <a onclick="scrollToSection('services')">Services</a>
+                    <a onclick="scrollToSection('doctors')">Doctors</a>
+                    <a onclick="scrollToSection('emergency')">Emergency</a>
+                    <a onclick="scrollToSection('tips')">Health Tips</a>
                 </div>
                 
                 <div class="auth-buttons">
@@ -764,674 +997,246 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <div class="main-content">
-        <!-- Home Page -->
-        <div id="homePage" class="page-section active">
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="container">
-                    <div class="hero-content">
-                        <div class="hero-text">
-                            <div class="hero-badge">
-                                <i class="fas fa-shield-alt"></i>
-                                AI-Powered Healthcare
-                            </div>
-                            <h1>Your Personal <span>Healthcare Assistant</span></h1>
-                            <p>OpenCare helps you understand symptoms, decode prescriptions, and find medical options with intelligent AI guidance. Making healthcare accessible and understandable for everyone.</p>
-                            <div class="hero-actions">
-                                <button class="btn btn-primary btn-large" onclick="scrollToSection('services')">
-                                    <i class="fas fa-play-circle"></i> Get Started
-                                </button>
-                                <button class="btn btn-outline btn-large" onclick="scrollToSection('about')">
-                                    <i class="fas fa-info-circle"></i> Learn More
-                                </button>
-                            </div>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <div class="hero-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            AI-Powered Healthcare
                         </div>
-                        
-                        <div class="hero-image">
-                            <div class="image-badge">
-                                <i class="fas fa-check-circle"></i>
-                                <div>
-                                    <strong>24/7 Available</strong>
-                                    <div style="font-size: 12px; color: var(--gray);">Always here to help</div>
-                                </div>
-                            </div>
-                            <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Healthcare Assistant">
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Services Section -->
-            <section class="services" id="services">
-                <div class="container">
-                    <div class="section-header">
-                        <div class="section-label">Our Services</div>
-                        <h2 class="section-title">Comprehensive Healthcare Solutions</h2>
-                        <p class="section-subtitle">Access intelligent healthcare guidance through our specialized features</p>
-                    </div>
-                    
-                    <div class="services-grid">
-                        <!-- Symptom Checker -->
-                        <div class="service-card" onclick="openSymptomChecker()">
-                            <div class="service-icon">
-                                <i class="fas fa-comment-medical"></i>
-                            </div>
-                            <h3>Symptom Analysis</h3>
-                            <p>Enter symptoms via text, voice, or selection. Receive instant condition predictions with risk assessment and actionable recommendations.</p>
-                            <button class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-arrow-right"></i> Try Symptom Checker
+                        <h1>Your Personal <span>Healthcare Assistant</span></h1>
+                        <p>OpenCare helps you understand symptoms, decode prescriptions, and find medical options with intelligent AI guidance. Making healthcare accessible and understandable for everyone.</p>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary btn-large" onclick="scrollToSection('services')">
+                                <i class="fas fa-play-circle"></i> Get Started
                             </button>
-                        </div>
-                        
-                        <!-- Prescription Reader -->
-                        <div class="service-card" onclick="openPrescriptionReader()">
-                            <div class="service-icon">
-                                <i class="fas fa-file-prescription"></i>
-                            </div>
-                            <h3>Prescription Decoder</h3>
-                            <p>Upload or type prescriptions to understand medication usage, dosage, side effects, and find affordable alternatives.</p>
-                            <button class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-arrow-right"></i> Read Prescription
-                            </button>
-                        </div>
-                        
-                        <!-- Nearby Clinics -->
-                        <div class="service-card" onclick="openNearbyClinics()">
-                            <div class="service-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
-                            <h3>Find Medical Facilities</h3>
-                            <p>Locate nearby clinics, pharmacies, and hospitals with real-time availability, directions, and contact information.</p>
-                            <button class="btn btn-primary" style="width: 100%;">
-                                <i class="fas fa-arrow-right"></i> Find Nearby
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Doctors Section -->
-            <section class="doctors-section">
-                <div class="container">
-                    <div class="section-header">
-                        <div class="section-label">Healthcare Professionals</div>
-                        <h2 class="section-title">Connect with Certified Doctors</h2>
-                        <p class="section-subtitle">Access qualified medical professionals for virtual consultations</p>
-                    </div>
-                    
-                    <div class="doctors-grid">
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <h3>Dr. Sarah Johnson</h3>
-                            <p class="doctor-specialty">General Physician</p>
-                            <div class="doctor-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                4.7 (120 reviews)
-                            </div>
-                            <button class="btn btn-primary" onclick="showPage('doctorsDirectory')">
-                                <i class="fas fa-calendar-alt"></i> View Profile
-                            </button>
-                        </div>
-                        
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <h3>Dr. Michael Chen</h3>
-                            <p class="doctor-specialty">Cardiologist</p>
-                            <div class="doctor-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                5.0 (95 reviews)
-                            </div>
-                            <button class="btn btn-primary" onclick="showPage('doctorsDirectory')">
-                                <i class="fas fa-calendar-alt"></i> View Profile
-                            </button>
-                        </div>
-                        
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <h3>Dr. Priya Sharma</h3>
-                            <p class="doctor-specialty">Pediatrician</p>
-                            <div class="doctor-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                5.0 (210 reviews)
-                            </div>
-                            <button class="btn btn-primary" onclick="showPage('doctorsDirectory')">
-                                <i class="fas fa-calendar-alt"></i> View Profile
+                            <button class="btn btn-outline btn-large" onclick="scrollToSection('doctors')">
+                                <i class="fas fa-info-circle"></i> Learn More
                             </button>
                         </div>
                     </div>
                     
-                    <button class="btn btn-outline btn-view-all" onclick="showPage('doctorsDirectory')">
-                        <i class="fas fa-search"></i> Browse All Doctors
-                    </button>
+                    <div class="hero-image">
+                        <div class="image-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <div>
+                                <strong>24/7 Available</strong>
+                                <div style="font-size: 12px; color: var(--gray);">Always here to help</div>
+                            </div>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Healthcare Assistant">
+                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Emergency Section -->
-            <section class="emergency-section">
-                <div class="container">
-                    <div class="emergency-content">
-                        <h2>Emergency Medical Assistance</h2>
-                        <p>If you're experiencing severe symptoms like chest pain, difficulty breathing, or sudden severe pain, seek immediate medical attention.</p>
-                        <button class="emergency-btn" onclick="callEmergency()">
-                            <i class="fas fa-phone-alt"></i> Call Emergency: 911
+        <!-- Services Section -->
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-label">Our Services</div>
+                    <h2 class="section-title">Comprehensive Healthcare Solutions</h2>
+                    <p class="section-subtitle">Access intelligent healthcare guidance through our specialized features</p>
+                </div>
+                
+                <div class="services-grid">
+                    <!-- Symptom Checker -->
+                    <div class="service-card" onclick="openSymptomChecker()">
+                        <div class="service-icon">
+                            <i class="fas fa-comment-medical"></i>
+                        </div>
+                        <h3>Symptom Analysis</h3>
+                        <p>Enter symptoms via text, voice, or selection. Receive instant condition predictions with risk assessment and actionable recommendations.</p>
+                        <button class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-arrow-right"></i> Try Symptom Checker
                         </button>
-                        <p style="margin-top: 20px; font-size: 14px; color: #7f1d1d;">
-                            <i class="fas fa-info-circle"></i> OpenCare provides informational guidance only. In emergencies, contact local emergency services.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Health Tips Section -->
-            <section class="tips-section">
-                <div class="container">
-                    <div class="section-header">
-                        <div class="section-label">Health & Wellness</div>
-                        <h2 class="section-title">Evidence-Based Health Tips</h2>
-                        <p class="section-subtitle">Practical advice for maintaining optimal health and wellness</p>
                     </div>
                     
-                    <div class="tips-grid">
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-heartbeat"></i>
-                            </div>
-                            <h3>Cardiovascular Health</h3>
-                            <p>Regular aerobic exercise, heart-healthy diet, stress management, and regular check-ups maintain optimal heart function.</p>
+                    <!-- Prescription Reader -->
+                    <div class="service-card" onclick="openPrescriptionReader()">
+                        <div class="service-icon">
+                            <i class="fas fa-file-prescription"></i>
                         </div>
-                        
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <h3>Mental Wellness</h3>
-                            <p>Practice mindfulness, maintain social connections, prioritize sleep, and seek professional support when needed.</p>
-                        </div>
-                        
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <h3>Physical Fitness</h3>
-                            <p>Combine cardio, strength training, and flexibility exercises. Aim for 150 minutes of moderate activity weekly.</p>
-                        </div>
-                        
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-apple-alt"></i>
-                            </div>
-                            <h3>Nutrition Balance</h3>
-                            <p>Eat diverse fruits and vegetables, stay hydrated, limit processed foods, and practice mindful eating habits.</p>
-                        </div>
-                        
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-bed"></i>
-                            </div>
-                            <h3>Sleep Hygiene</h3>
-                            <p>Maintain consistent sleep schedule, create restful environment, limit screen time, and aim for 7-9 hours nightly.</p>
-                        </div>
-                        
-                        <div class="tip-card">
-                            <div class="tip-icon">
-                                <i class="fas fa-lungs"></i>
-                            </div>
-                            <h3>Respiratory Care</h3>
-                            <p>Avoid pollutants, practice deep breathing, maintain indoor air quality, and engage in regular cardiovascular exercise.</p>
-                        </div>
+                        <h3>Prescription Decoder</h3>
+                        <p>Upload or type prescriptions to understand medication usage, dosage, side effects, and find affordable alternatives.</p>
+                        <button class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-arrow-right"></i> Read Prescription
+                        </button>
                     </div>
                     
-                    <button class="btn btn-outline btn-view-all" onclick="showPage('healthTipsDirectory')">
-                        <i class="fas fa-book-medical"></i> View All Health Tips
-                    </button>
-                </div>
-            </section>
-        </div>
-
-        <!-- Doctors Directory Page -->
-        <div id="doctorsDirectory" class="page-section">
-            <section class="doctors-directory">
-                <div class="container">
-                    <div class="page-navigation">
-                        <div class="page-title">
-                            <h1>Find Your Doctor</h1>
+                    <!-- Nearby Clinics -->
+                    <div class="service-card" onclick="openNearbyClinics()">
+                        <div class="service-icon">
+                            <i class="fas fa-map-marker-alt"></i>
                         </div>
-                        <div class="back-to-home" onclick="showPage('homePage')">
-                            <i class="fas fa-arrow-left"></i> Back to Home
-                        </div>
-                    </div>
-                    
-                    <div class="doctors-directory-header">
-                        <p>Connect with certified healthcare professionals across various specialties. Book appointments or schedule virtual consultations.</p>
-                    </div>
-
-                    <!-- Filters -->
-                    <div class="filters" style="padding: 0 0 40px 0;">
-                        <div class="filter-container">
-                            <div class="search-box">
-                                <label>Search Doctors</label>
-                                <input type="text" placeholder="Search by name, specialty, or condition...">
-                            </div>
-                            <div class="filter-group">
-                                <label>Specialty</label>
-                                <select class="filter-select">
-                                    <option value="">All Specialties</option>
-                                    <option value="general">General Physician</option>
-                                    <option value="cardio">Cardiologist</option>
-                                    <option value="pedia">Pediatrician</option>
-                                    <option value="derma">Dermatologist</option>
-                                    <option value="neuro">Neurologist</option>
-                                    <option value="ortho">Orthopedist</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Availability</label>
-                                <select class="filter-select">
-                                    <option value="">Any Time</option>
-                                    <option value="today">Today</option>
-                                    <option value="week">This Week</option>
-                                    <option value="online">Online Now</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Doctors Grid -->
-                    <div class="doctors-grid">
-                        <!-- Doctor 1 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. Sarah Johnson</h2>
-                                <div class="doctor-specialty">General Physician</div>
-                                <div class="doctor-experience">10+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    4.7 (120 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Specializes in internal medicine and preventive care. Available for in-person and virtual consultations.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('sarah-johnson')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('sarah-johnson')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Doctor 2 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. Michael Chen</h2>
-                                <div class="doctor-specialty">Cardiologist</div>
-                                <div class="doctor-experience">15+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    5.0 (95 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Heart specialist with expertise in cardiovascular diseases, hypertension, and preventive cardiology.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('michael-chen')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('michael-chen')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Doctor 3 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. Priya Sharma</h2>
-                                <div class="doctor-specialty">Pediatrician</div>
-                                <div class="doctor-experience">12+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    5.0 (210 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Children's health specialist with expertise in growth, development, and childhood illnesses.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('priya-sharma')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('priya-sharma')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Doctor 4 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. Robert Williams</h2>
-                                <div class="doctor-specialty">Dermatologist</div>
-                                <div class="doctor-experience">8+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    4.6 (85 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Skin health specialist with expertise in dermatology, cosmetic procedures, and skin cancer screening.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('robert-williams')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('robert-williams')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Doctor 5 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. Lisa Wang</h2>
-                                <div class="doctor-specialty">Neurologist</div>
-                                <div class="doctor-experience">14+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    4.9 (156 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Brain and nervous system specialist with expertise in neurological disorders and treatments.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('lisa-wang')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('lisa-wang')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Doctor 6 -->
-                        <div class="doctor-card">
-                            <div class="doctor-icon">
-                                <i class="fas fa-user-md"></i>
-                            </div>
-                            <div class="doctor-info">
-                                <h2>Dr. James Miller</h2>
-                                <div class="doctor-specialty">Orthopedist</div>
-                                <div class="doctor-experience">18+ years experience</div>
-                                <div class="doctor-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    4.8 (132 reviews)
-                                </div>
-                                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                                    Bone and joint specialist with expertise in orthopedic surgery, sports injuries, and rehabilitation.
-                                </p>
-                                <div class="doctor-actions">
-                                    <button class="btn btn-primary" onclick="bookConsultation('james-miller')">
-                                        <i class="fas fa-calendar-alt"></i> Book
-                                    </button>
-                                    <button class="btn btn-outline" onclick="viewProfile('james-miller')">
-                                        <i class="fas fa-user"></i> Profile
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Load More Button -->
-                    <div style="text-align: center; margin-top: 50px;">
-                        <button class="btn btn-outline" onclick="loadMoreDoctors()">
-                            <i class="fas fa-plus"></i> Load More Doctors
+                        <h3>Find Medical Facilities</h3>
+                        <p>Locate nearby clinics, pharmacies, and hospitals with real-time availability, directions, and contact information.</p>
+                        <button class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-arrow-right"></i> Find Nearby
                         </button>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
 
-        <!-- Health Tips Directory Page -->
-        <div id="healthTipsDirectory" class="page-section">
-            <section class="health-tips-directory">
-                <div class="container">
-                    <div class="page-navigation">
-                        <div class="page-title">
-                            <h1>Health & Wellness Tips</h1>
+        <!-- Doctors Section -->
+        <section class="doctors-section" id="doctors">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-label">Healthcare Professionals</div>
+                    <h2 class="section-title">Connect with Certified Doctors</h2>
+                    <p class="section-subtitle">Access qualified medical professionals for virtual consultations</p>
+                </div>
+                
+                <div class="doctors-grid">
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
                         </div>
-                        <div class="back-to-home" onclick="showPage('homePage')">
-                            <i class="fas fa-arrow-left"></i> Back to Home
+                        <h3>Dr. Sarah Johnson</h3>
+                        <p class="doctor-specialty">General Physician</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            4.7 (120 reviews)
                         </div>
+                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                            <i class="fas fa-calendar-alt"></i> View Profile
+                        </button>
                     </div>
                     
-                    <div class="health-tips-header">
-                        <p>Evidence-based health advice from medical professionals. Learn how to maintain and improve your health through lifestyle choices.</p>
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Michael Chen</h3>
+                        <p class="doctor-specialty">Cardiologist</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            5.0 (95 reviews)
+                        </div>
+                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                            <i class="fas fa-calendar-alt"></i> View Profile
+                        </button>
                     </div>
-
-                    <!-- Categories -->
-                    <div class="categories" style="padding: 0 0 40px 0;">
-                        <div class="category-container">
-                            <button class="category-btn active" onclick="filterTips('all')">
-                                <i class="fas fa-star"></i> All Tips
-                            </button>
-                            <button class="category-btn" onclick="filterTips('heart')">
-                                <i class="fas fa-heart"></i> Heart Health
-                            </button>
-                            <button class="category-btn" onclick="filterTips('mental')">
-                                <i class="fas fa-brain"></i> Mental Wellness
-                            </button>
-                            <button class="category-btn" onclick="filterTips('fitness')">
-                                <i class="fas fa-dumbbell"></i> Fitness
-                            </button>
-                            <button class="category-btn" onclick="filterTips('nutrition')">
-                                <i class="fas fa-apple-alt"></i> Nutrition
-                            </button>
-                            <button class="category-btn" onclick="filterTips('sleep')">
-                                <i class="fas fa-bed"></i> Sleep
-                            </button>
-                            <button class="category-btn" onclick="filterTips('prevention')">
-                                <i class="fas fa-shield-alt"></i> Prevention
-                            </button>
+                    
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
                         </div>
-                    </div>
-
-                    <!-- Featured Tip -->
-                    <div class="featured-tip" style="margin: 0 0 60px 0; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: var(--radius); padding: 48px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
-                        <div class="featured-content">
-                            <h2 style="color: white;">Daily Exercise for Heart Health</h2>
-                            <p>Just 30 minutes of moderate exercise daily can reduce your risk of heart disease by 30%. Combine cardio, strength training, and flexibility exercises for optimal results.</p>
-                            <button class="btn" style="background: white; color: var(--primary);" onclick="readFullTip('exercise-heart')">
-                                <i class="fas fa-book-open"></i> Read Full Article
-                            </button>
+                        <h3>Dr. Priya Sharma</h3>
+                        <p class="doctor-specialty">Pediatrician</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            5.0 (210 reviews)
                         </div>
-                        <div class="featured-image">
-                            <i class="fas fa-heartbeat" style="font-size: 120px; opacity: 0.8;"></i>
-                        </div>
-                    </div>
-
-                    <!-- Tips Grid -->
-                    <div class="tips-grid">
-                        <!-- Tip 1 -->
-                        <div class="tip-card" data-category="heart">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Heart Health</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-heartbeat"></i>
-                            </div>
-                            <h2>Managing Blood Pressure</h2>
-                            <p class="tip-excerpt">
-                                Learn how to maintain healthy blood pressure through diet, exercise, and stress management techniques.
-                                High blood pressure often has no symptoms but can lead to serious health issues.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 5 min read</span>
-                                <a class="read-more" onclick="readFullTip('blood-pressure')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Tip 2 -->
-                        <div class="tip-card" data-category="mental">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Mental Wellness</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <h2>Stress Reduction Techniques</h2>
-                            <p class="tip-excerpt">
-                                Practical mindfulness exercises, breathing techniques, and lifestyle adjustments to manage daily stress
-                                and improve mental wellbeing.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 4 min read</span>
-                                <a class="read-more" onclick="readFullTip('stress-reduction')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Tip 3 -->
-                        <div class="tip-card" data-category="nutrition">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Nutrition</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-apple-alt"></i>
-                            </div>
-                            <h2>Balanced Diet Essentials</h2>
-                            <p class="tip-excerpt">
-                                Understanding macronutrients, portion control, and how to create balanced meals that provide
-                                all essential nutrients for optimal health.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 6 min read</span>
-                                <a class="read-more" onclick="readFullTip('balanced-diet')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Tip 4 -->
-                        <div class="tip-card" data-category="sleep">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Sleep</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-bed"></i>
-                            </div>
-                            <h2>Improving Sleep Quality</h2>
-                            <p class="tip-excerpt">
-                                Creating a sleep-conducive environment, establishing routines, and addressing common
-                                sleep disruptors for better rest and recovery.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 5 min read</span>
-                                <a class="read-more" onclick="readFullTip('sleep-quality')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Tip 5 -->
-                        <div class="tip-card" data-category="fitness">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Fitness</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <h2>Home Workout Routine</h2>
-                            <p class="tip-excerpt">
-                                Effective exercises you can do at home with minimal equipment to maintain strength,
-                                flexibility, and cardiovascular health.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 7 min read</span>
-                                <a class="read-more" onclick="readFullTip('home-workout')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Tip 6 -->
-                        <div class="tip-card" data-category="prevention">
-                            <div class="tip-category" style="position: absolute; top: 16px; right: 16px; padding: 6px 12px; background: var(--primary-light); color: var(--primary); border-radius: 100px; font-size: 12px; font-weight: 500;">Prevention</div>
-                            <div class="tip-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <h2>Seasonal Illness Prevention</h2>
-                            <p class="tip-excerpt">
-                                Boosting your immune system, proper hygiene practices, and preventive measures
-                                to reduce the risk of seasonal illnesses.
-                            </p>
-                            <div class="tip-meta">
-                                <span><i class="fas fa-clock"></i> 4 min read</span>
-                                <a class="read-more" onclick="readFullTip('illness-prevention')">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
+                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                            <i class="fas fa-calendar-alt"></i> View Profile
+                        </button>
                     </div>
                 </div>
-            </section>
-        </div>
+                
+                <button class="btn btn-outline btn-view-all" onclick="openDoctorsModal()">
+                    <i class="fas fa-search"></i> Browse All Doctors
+                </button>
+            </div>
+        </section>
+
+        <!-- Emergency Section -->
+        <section class="emergency-section" id="emergency">
+            <div class="container">
+                <div class="emergency-content">
+                    <h2>Emergency Medical Assistance</h2>
+                    <p>If you're experiencing severe symptoms like chest pain, difficulty breathing, or sudden severe pain, seek immediate medical attention.</p>
+                    <button class="emergency-btn" onclick="callEmergency()">
+                        <i class="fas fa-phone-alt"></i> Call Emergency: 911
+                    </button>
+                    <p style="margin-top: 20px; font-size: 14px; color: #7f1d1d;">
+                        <i class="fas fa-info-circle"></i> OpenCare provides informational guidance only. In emergencies, contact local emergency services.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Health Tips Section -->
+        <section class="tips-section" id="tips">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-label">Health & Wellness</div>
+                    <h2 class="section-title">Evidence-Based Health Tips</h2>
+                    <p class="section-subtitle">Practical advice for maintaining optimal health and wellness</p>
+                </div>
+                
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>Cardiovascular Health</h3>
+                        <p>Regular aerobic exercise, heart-healthy diet, stress management, and regular check-ups maintain optimal heart function.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>Mental Wellness</h3>
+                        <p>Practice mindfulness, maintain social connections, prioritize sleep, and seek professional support when needed.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <h3>Physical Fitness</h3>
+                        <p>Combine cardio, strength training, and flexibility exercises. Aim for 150 minutes of moderate activity weekly.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <h3>Nutrition Balance</h3>
+                        <p>Eat diverse fruits and vegetables, stay hydrated, limit processed foods, and practice mindful eating habits.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <h3>Sleep Hygiene</h3>
+                        <p>Maintain consistent sleep schedule, create restful environment, limit screen time, and aim for 7-9 hours nightly.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-icon">
+                            <i class="fas fa-lungs"></i>
+                        </div>
+                        <h3>Respiratory Care</h3>
+                        <p>Avoid pollutants, practice deep breathing, maintain indoor air quality, and engage in regular cardiovascular exercise.</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline btn-view-all" onclick="openHealthTipsModal()">
+                    <i class="fas fa-book-medical"></i> View All Health Tips
+                </button>
+            </div>
+        </section>
     </div>
 
     <!-- Footer -->
@@ -1456,7 +1261,7 @@
                         <li><a onclick="openSymptomChecker()"><i class="fas fa-chevron-right"></i> Symptom Checker</a></li>
                         <li><a onclick="openPrescriptionReader()"><i class="fas fa-chevron-right"></i> Prescription Reader</a></li>
                         <li><a onclick="openNearbyClinics()"><i class="fas fa-chevron-right"></i> Find Nearby Clinics</a></li>
-                        <li><a onclick="showPage('healthTipsDirectory')"><i class="fas fa-chevron-right"></i> Health Tips</a></li>
+                        <li><a onclick="openHealthTipsModal()"><i class="fas fa-chevron-right"></i> Health Tips</a></li>
                     </ul>
                 </div>
                 
@@ -1486,44 +1291,304 @@
         </div>
     </footer>
 
-    <script>
-        // Page Navigation
-        function showPage(pageId) {
-            // Hide all pages
-            const pages = document.querySelectorAll('.page-section');
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
+    <!-- Doctors Directory Modal -->
+    <div id="doctorsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeDoctorsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h1>Find Your Doctor</h1>
+                <p>Connect with certified healthcare professionals across various specialties. Book appointments or schedule virtual consultations.</p>
+            </div>
             
-            // Show selected page
-            const selectedPage = document.getElementById(pageId);
-            selectedPage.classList.add('active');
-            
-            // Update active nav link
-            const navLinks = document.querySelectorAll('.nav-links a');
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // Update active nav based on page
-            if (pageId === 'homePage') {
-                navLinks[0].classList.add('active');
-                document.title = 'OpenCare | AI-Powered Healthcare Assistant';
-            } else if (pageId === 'doctorsDirectory') {
-                navLinks[2].classList.add('active');
-                document.title = 'Doctors Directory | OpenCare';
-            } else if (pageId === 'healthTipsDirectory') {
-                navLinks[4].classList.add('active');
-                document.title = 'Health Tips | OpenCare';
-            }
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
-        }
+            <div class="modal-body">
+                <!-- Filters -->
+                <div class="doctors-filters">
+                    <div class="filter-group">
+                        <label>Search Doctors</label>
+                        <input type="text" class="search-input" placeholder="Search by name, specialty, or condition...">
+                    </div>
+                    <div class="filter-group">
+                        <label>Specialty</label>
+                        <select class="filter-select">
+                            <option value="">All Specialties</option>
+                            <option value="general">General Physician</option>
+                            <option value="cardio">Cardiologist</option>
+                            <option value="pedia">Pediatrician</option>
+                            <option value="derma">Dermatologist</option>
+                            <option value="neuro">Neurologist</option>
+                            <option value="ortho">Orthopedist</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Availability</label>
+                        <select class="filter-select">
+                            <option value="">Any Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="online">Online Now</option>
+                        </select>
+                    </div>
+                </div>
 
+                <!-- Doctors Grid -->
+                <div class="doctors-modal-grid">
+                    <!-- Doctor 1 -->
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Sarah Johnson</h3>
+                        <p class="doctor-specialty">General Physician</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            4.7 (120 reviews)
+                        </div>
+                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                            Specializes in internal medicine and preventive care. Available for in-person and virtual consultations.
+                        </p>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('sarah-johnson')">
+                                <i class="fas fa-calendar-alt"></i> Book
+                            </button>
+                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('sarah-johnson')">
+                                <i class="fas fa-user"></i> Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Doctor 2 -->
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Michael Chen</h3>
+                        <p class="doctor-specialty">Cardiologist</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            5.0 (95 reviews)
+                        </div>
+                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                            Heart specialist with expertise in cardiovascular diseases, hypertension, and preventive cardiology.
+                        </p>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('michael-chen')">
+                                <i class="fas fa-calendar-alt"></i> Book
+                            </button>
+                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('michael-chen')">
+                                <i class="fas fa-user"></i> Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Doctor 3 -->
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Priya Sharma</h3>
+                        <p class="doctor-specialty">Pediatrician</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            5.0 (210 reviews)
+                        </div>
+                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                            Children's health specialist with expertise in growth, development, and childhood illnesses.
+                        </p>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('priya-sharma')">
+                                <i class="fas fa-calendar-alt"></i> Book
+                            </button>
+                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('priya-sharma')">
+                                <i class="fas fa-user"></i> Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Doctor 4 -->
+                    <div class="doctor-card">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Robert Williams</h3>
+                        <p class="doctor-specialty">Dermatologist</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            4.6 (85 reviews)
+                        </div>
+                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                            Skin health specialist with expertise in dermatology, cosmetic procedures, and skin cancer screening.
+                        </p>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('robert-williams')">
+                                <i class="fas fa-calendar-alt"></i> Book
+                            </button>
+                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('robert-williams')">
+                                <i class="fas fa-user"></i> Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More Button -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-outline" onclick="loadMoreDoctors()">
+                        <i class="fas fa-plus"></i> Load More Doctors
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Tips Modal -->
+    <div id="healthTipsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeHealthTipsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h1>Health & Wellness Tips</h1>
+                <p>Evidence-based health advice from medical professionals. Learn how to maintain and improve your health through lifestyle choices.</p>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Categories -->
+                <div class="tips-categories">
+                    <button class="category-btn active" onclick="filterTips('all')">
+                        <i class="fas fa-star"></i> All Tips
+                    </button>
+                    <button class="category-btn" onclick="filterTips('heart')">
+                        <i class="fas fa-heart"></i> Heart Health
+                    </button>
+                    <button class="category-btn" onclick="filterTips('mental')">
+                        <i class="fas fa-brain"></i> Mental Wellness
+                    </button>
+                    <button class="category-btn" onclick="filterTips('fitness')">
+                        <i class="fas fa-dumbbell"></i> Fitness
+                    </button>
+                    <button class="category-btn" onclick="filterTips('nutrition')">
+                        <i class="fas fa-apple-alt"></i> Nutrition
+                    </button>
+                    <button class="category-btn" onclick="filterTips('sleep')">
+                        <i class="fas fa-bed"></i> Sleep
+                    </button>
+                    <button class="category-btn" onclick="filterTips('prevention')">
+                        <i class="fas fa-shield-alt"></i> Prevention
+                    </button>
+                </div>
+
+                <!-- Featured Tip -->
+                <div class="featured-tip">
+                    <div class="featured-content">
+                        <h2>Daily Exercise for Heart Health</h2>
+                        <p>Just 30 minutes of moderate exercise daily can reduce your risk of heart disease by 30%. Combine cardio, strength training, and flexibility exercises for optimal results.</p>
+                        <button class="btn" style="background: white; color: var(--primary);" onclick="readFullTip('exercise-heart')">
+                            <i class="fas fa-book-open"></i> Read Full Article
+                        </button>
+                    </div>
+                    <div class="featured-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                </div>
+
+                <!-- Tips Grid -->
+                <div class="tips-modal-grid">
+                    <!-- Tip 1 -->
+                    <div class="tip-modal-card" data-category="heart">
+                        <div class="tip-category-badge">Heart Health</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h2>Managing Blood Pressure</h2>
+                        <p style="color: var(--gray); margin: 15px 0;">
+                            Learn how to maintain healthy blood pressure through diet, exercise, and stress management techniques.
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 5 min read</span>
+                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('blood-pressure')">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tip 2 -->
+                    <div class="tip-modal-card" data-category="mental">
+                        <div class="tip-category-badge">Mental Wellness</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h2>Stress Reduction Techniques</h2>
+                        <p style="color: var(--gray); margin: 15px 0;">
+                            Practical mindfulness exercises, breathing techniques, and lifestyle adjustments to manage daily stress.
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 4 min read</span>
+                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('stress-reduction')">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tip 3 -->
+                    <div class="tip-modal-card" data-category="nutrition">
+                        <div class="tip-category-badge">Nutrition</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <h2>Balanced Diet Essentials</h2>
+                        <p style="color: var(--gray); margin: 15px 0;">
+                            Understanding macronutrients, portion control, and how to create balanced meals for optimal health.
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 6 min read</span>
+                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('balanced-diet')">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tip 4 -->
+                    <div class="tip-modal-card" data-category="sleep">
+                        <div class="tip-category-badge">Sleep</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <h2>Improving Sleep Quality</h2>
+                        <p style="color: var(--gray); margin: 15px 0;">
+                            Creating a sleep-conducive environment and establishing routines for better rest and recovery.
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 5 min read</span>
+                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('sleep-quality')">
+                                Read More <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // Service functions
         function openSymptomChecker() {
-            // This will open your Python symptom checker when ready
             alert('Symptom Checker would open here. Connect to your Python backend.');
             // window.open('http://localhost:5000/symptom-checker', '_blank');
         }
@@ -1534,7 +1599,6 @@
         }
 
         function openNearbyClinics() {
-            // This will open your Python nearby clinics when ready
             alert('Nearby Clinics would open here. Connect to your Python backend.');
             // window.open('http://localhost:5000/nearby-clinics', '_blank');
         }
@@ -1543,6 +1607,27 @@
             if (confirm('In a real emergency, please call 911 immediately.\n\nFor demonstration: Show emergency resources?')) {
                 alert('Emergency resources page would open. Remember: Always call 911 for real emergencies.');
             }
+        }
+
+        // Modal functions
+        function openDoctorsModal() {
+            document.getElementById('doctorsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDoctorsModal() {
+            document.getElementById('doctorsModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openHealthTipsModal() {
+            document.getElementById('healthTipsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHealthTipsModal() {
+            document.getElementById('healthTipsModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
         }
 
         // Doctors directory functions
@@ -1560,11 +1645,11 @@
 
         // Health tips functions
         function filterTips(category) {
-            const buttons = document.querySelectorAll('.category-btn');
+            const buttons = document.querySelectorAll('#healthTipsModal .category-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            const tips = document.querySelectorAll('.tip-card');
+            const tips = document.querySelectorAll('#healthTipsModal .tip-modal-card');
             tips.forEach(tip => {
                 if (category === 'all' || tip.dataset.category === category) {
                     tip.style.display = 'block';
@@ -1578,15 +1663,15 @@
             alert(`Opening full article: ${tipId}\n\nThis would redirect to a detailed article page with complete information.`);
         }
 
-        // Smooth scrolling for home page
+        // Navigation functions
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function scrollToSection(sectionId) {
-            if (window.location.pathname === '/' || window.location.pathname.includes('index.html')) {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -1599,20 +1684,37 @@
             alert('Signup page would open here.');
         });
 
+        // Close modals on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeDoctorsModal();
+                closeHealthTipsModal();
+            }
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(event) {
+                if (event.target === this) {
+                    if (this.id === 'doctorsModal') closeDoctorsModal();
+                    if (this.id === 'healthTipsModal') closeHealthTipsModal();
+                }
+            });
+        });
+
         // Header scroll effect
         window.addEventListener('scroll', () => {
             const header = document.querySelector('header');
             if (window.scrollY > 50) {
-                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
             } else {
                 header.style.boxShadow = 'none';
             }
         });
 
-        // Initialize
+        // Initialize filter functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize filter functionality
-            const searchInput = document.querySelector('input[type="text"]');
+            const searchInput = document.querySelector('.search-input');
             const specialtySelect = document.querySelectorAll('.filter-select')[0];
             const availabilitySelect = document.querySelectorAll('.filter-select')[1];
 
@@ -1621,7 +1723,8 @@
                 const specialty = specialtySelect.value;
                 const availability = availabilitySelect.value;
                 
-                alert(`Applying filters:\nSearch: ${searchTerm}\nSpecialty: ${specialty}\nAvailability: ${availability}\n\nWould filter doctors list in real application.`);
+                console.log(`Applying filters: Search=${searchTerm}, Specialty=${specialty}, Availability=${availability}`);
+                // In real app, this would filter the doctor cards
             }
 
             if (searchInput) {
