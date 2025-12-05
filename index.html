@@ -6,6 +6,21 @@
     <title>OpenCare | AI-Powered Healthcare Assistant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <!-- Leaflet.js JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Leaflet Control Geocoder for search -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- Leaflet Marker Cluster for grouping markers -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -37,6 +52,7 @@
 
         html, body {
             height: 100%;
+            overflow-x: hidden;
         }
 
         body {
@@ -44,7 +60,6 @@
             line-height: 1.6;
             color: var(--dark);
             background-color: white;
-            overflow-x: hidden;
             position: relative;
         }
 
@@ -153,7 +168,9 @@
             border: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .btn-login {
@@ -276,10 +293,13 @@
 
         .hero-image {
             position: relative;
+            display: flex;
+            justify-content: center;
         }
 
         .hero-image img {
             width: 100%;
+            max-width: 600px;
             border-radius: var(--radius);
             box-shadow: var(--shadow-xl);
             transform: perspective(1000px) rotateY(-10deg);
@@ -363,6 +383,10 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 380px;
         }
 
         .service-card:hover {
@@ -399,21 +423,31 @@
             margin-bottom: 24px;
             color: var(--primary);
             font-size: 24px;
+            flex-shrink: 0;
         }
 
         .service-card h3 {
             font-size: 22px;
             margin-bottom: 16px;
             color: var(--dark);
+            line-height: 1.3;
         }
 
         .service-card p {
             color: var(--gray);
             margin-bottom: 24px;
             font-size: 15px;
+            line-height: 1.6;
+            flex-grow: 1;
         }
 
-        /* Doctors Section */
+        .service-card .btn {
+            width: 100%;
+            margin-top: auto;
+            padding: 12px 24px;
+        }
+
+        /* Enhanced Doctors Section */
         .doctors-section {
             padding: 100px 0;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -434,11 +468,19 @@
             border: 1px solid var(--border);
             transition: var(--transition);
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: visible;
         }
 
         .doctor-card:hover {
             transform: translateY(-6px);
             box-shadow: var(--shadow-xl);
+        }
+
+        .doctor-card.expanded {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
         }
 
         .doctor-icon {
@@ -464,13 +506,72 @@
         .doctor-specialty {
             color: var(--gray);
             font-size: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
+        }
+
+        .doctor-experience {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 500;
         }
 
         .doctor-rating {
             color: var(--warning);
             font-size: 14px;
             margin-bottom: 20px;
+        }
+
+        .doctor-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+            padding: 15px;
+            background: var(--gray-light);
+            border-radius: var(--radius);
+            display: none;
+        }
+
+        .doctor-card.expanded .doctor-details-grid {
+            display: grid;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-item strong {
+            display: block;
+            color: var(--dark);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .detail-item span {
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        .doctor-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .doctor-card.expanded .doctor-actions {
+            display: flex;
+        }
+
+        .doctor-actions .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
         }
 
         .btn-view-all {
@@ -506,17 +607,18 @@
             z-index: 1;
         }
 
-        .emergency h2 {
+        .emergency-content h2 {
             font-size: 36px;
             margin-bottom: 16px;
             color: #dc2626;
         }
 
-        .emergency p {
+        .emergency-content p {
             font-size: 18px;
             color: #7f1d1d;
             margin-bottom: 32px;
             opacity: 0.9;
+            line-height: 1.6;
         }
 
         .emergency-btn {
@@ -533,6 +635,7 @@
             align-items: center;
             gap: 12px;
             box-shadow: var(--shadow-xl);
+            margin: 0 auto;
         }
 
         .emergency-btn:hover {
@@ -541,32 +644,92 @@
             box-shadow: 0 15px 30px rgba(220, 38, 38, 0.3);
         }
 
-        /* Tips Section */
+        .emergency-note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f1d1d;
+            line-height: 1.5;
+        }
+
+        /* Enhanced Health Tips Section - FIXED */
         .tips-section {
             padding: 100px 0;
             background: white;
+            overflow: visible;
         }
 
-        .tips-grid {
-            display: grid;
+        .tips-categories {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: var(--gray-light);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .category-btn:hover:not(.active) {
+            background: var(--border);
+        }
+
+        .tips-category-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            margin-top: 40px;
+            margin-bottom: 40px;
         }
 
-        .tip-card {
+        .tips-category-section.active {
+            display: grid;
+        }
+
+        .tip-card-expanded {
             background: white;
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 32px;
+            padding: 30px;
             transition: var(--transition);
             box-shadow: var(--shadow);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            min-height: 320px;
         }
 
-        .tip-card:hover {
-            transform: translateY(-4px);
+        .tip-card-expanded:hover {
+            transform: translateY(-5px);
             border-color: var(--primary);
             box-shadow: var(--shadow-xl);
+        }
+
+        .tip-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         .tip-icon {
@@ -580,17 +743,46 @@
             margin-bottom: 20px;
             color: var(--primary);
             font-size: 20px;
+            flex-shrink: 0;
         }
 
-        .tip-card h3 {
+        .tip-card-expanded h3 {
             font-size: 20px;
             margin-bottom: 12px;
             color: var(--dark);
+            line-height: 1.4;
         }
 
-        .tip-card p {
+        .tip-content {
+            margin-top: 10px;
+        }
+
+        .tip-card-expanded p {
             color: var(--gray);
-            font-size: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .tip-points {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .tip-points li {
+            margin-bottom: 8px;
+            color: var(--gray);
+            font-size: 14px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .tip-points li:before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+            position: absolute;
+            left: -20px;
         }
 
         /* Footer */
@@ -598,6 +790,8 @@
             background: var(--dark);
             color: white;
             padding: 80px 0 40px;
+            position: relative;
+            z-index: 1;
         }
 
         .footer-content {
@@ -656,6 +850,7 @@
             border-top: 1px solid #334155;
             color: #94a3b8;
             font-size: 14px;
+            line-height: 1.6;
         }
 
         /* MODAL OVERLAY PAGES */
@@ -689,7 +884,7 @@
             position: relative;
             background: white;
             width: 95%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 40px auto;
             border-radius: var(--radius);
             box-shadow: var(--shadow-xl);
@@ -749,21 +944,279 @@
             transform: rotate(90deg);
         }
 
-        .modal-body {
-            padding: 40px;
+        /* Map Modal Specific Styles */
+        #mapModal .modal-body {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            min-height: 600px;
+        }
+
+        /* Result Card Styling */
+        .result-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .result-card.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Map Controls */
+        .map-control-btn {
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 8px;
+        }
+
+        .map-control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Map Marker Icons */
+        .custom-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            box-shadow: var(--shadow);
+            border: 3px solid white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+            z-index: 1000;
+        }
+
+        /* Responsive Map Layout */
+        .map-layout {
+            display: flex;
             flex: 1;
+            min-height: 0;
+            height: 600px;
+        }
+
+        .map-container {
+            flex: 3;
+            position: relative;
+            min-height: 400px;
+            height: 100%;
+        }
+
+        .results-sidebar {
+            flex: 1;
+            min-width: 350px;
+            max-width: 400px;
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .results-sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--gray-light);
+            flex-shrink: 0;
+        }
+
+        .results-sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .no-results i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .map-loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Loading spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Leaflet map styles */
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .leaflet-control {
+            margin-right: 20px !important;
+        }
+
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+            min-width: 250px;
+        }
+
+        .leaflet-popup-content h4 {
+            margin: 0 0 10px 0;
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .leaflet-popup-content p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Ensure map markers are above tiles */
+        .leaflet-marker-icon {
+            z-index: 1000 !important;
+        }
+
+        /* Marker cluster styles */
+        .marker-cluster-small {
+            background-color: rgba(181, 226, 140, 0.6);
+        }
+        .marker-cluster-small div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(241, 211, 87, 0.6);
+        }
+        .marker-cluster-medium div {
+            background-color: rgba(240, 194, 12, 0.6);
+        }
+
+        .marker-cluster-large {
+            background-color: rgba(253, 156, 115, 0.6);
+        }
+        .marker-cluster-large div {
+            background-color: rgba(241, 128, 23, 0.6);
+        }
+
+        /* Map Search Controls */
+        .search-container {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            background: var(--gray-light);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-container {
+            flex: 2;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-input-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Filter Panel Styles */
+        .filter-panel {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            max-height: 0;
+        }
+
+        .filter-panel.expanded {
+            max-height: 500px;
+        }
+
+        .filter-panel-content {
+            padding: 20px;
+            max-height: 500px;
             overflow-y: auto;
         }
 
-        /* Doctors Modal Specific */
-        .doctors-filters {
+        .filter-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
-            padding: 30px;
-            background: var(--gray-light);
-            border-radius: var(--radius);
+            margin-bottom: 20px;
         }
 
         .filter-group {
@@ -776,9 +1229,12 @@
             font-weight: 500;
             color: var(--dark);
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .filter-select, .search-input {
+        .filter-select {
             padding: 12px 16px;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -786,107 +1242,193 @@
             background: white;
             color: var(--dark);
             width: 100%;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
         }
 
-        .search-input {
-            padding-left: 45px;
-            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 16px center;
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .doctors-modal-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        /* Health Tips Modal Specific */
-        .tips-categories {
+        .filter-actions {
             display: flex;
             gap: 12px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
+            justify-content: flex-end;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
         }
 
-        .category-btn {
-            padding: 10px 20px;
-            background: var(--gray-light);
-            border: none;
-            border-radius: 100px;
-            font-weight: 500;
-            color: var(--dark);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        /* Map Controls Container */
+        .leaflet-top.leaflet-left {
+            margin-top: 20px;
+            margin-left: 20px;
         }
 
-        .category-btn:hover, .category-btn.active {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
+        /* Location Accuracy Circle */
+        .location-accuracy {
+            fill: rgba(37, 99, 235, 0.2);
+            stroke: var(--primary);
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
         }
 
-        .featured-tip {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: var(--radius);
-            padding: 40px;
-            color: white;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .featured-content h2 {
-            font-size: 28px;
-            margin-bottom: 16px;
-            color: white;
-        }
-
-        .featured-content p {
-            opacity: 0.9;
-            margin-bottom: 24px;
-        }
-
-        .featured-icon {
-            font-size: 100px;
-            opacity: 0.8;
-            text-align: center;
+        /* Doctors & Tips Modals - FIXED */
+        .modal-content.large {
+            max-width: 1200px;
+            max-height: 85vh;
         }
 
         .tips-modal-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: none; /* REMOVED FIXED HEIGHT */
         }
 
-        .tip-modal-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 30px;
-            transition: var(--transition);
+        .tips-search-container {
+            margin: 20px 0;
             position: relative;
         }
 
-        .tip-modal-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
+        .tips-search {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: var(--transition);
         }
 
-        .tip-category-badge {
+        .tips-search:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .tips-search-container i {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            padding: 6px 12px;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .doctors-modal-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            padding: 30px;
+            max-height: 70vh;
+            overflow: hidden;
+        }
+
+        .doctors-sidebar {
+            border-right: 1px solid var(--border);
+            padding-right: 20px;
+            overflow-y: auto;
+        }
+
+        .doctor-list-item {
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .doctor-list-item:hover,
+        .doctor-list-item.active {
+            border-color: var(--primary);
             background: var(--primary-light);
-            color: var(--primary);
-            border-radius: 100px;
+        }
+
+        .doctor-detail-view {
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .doctor-header {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .doctor-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            border: 4px solid white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .doctor-info h2 {
+            margin: 0 0 10px 0;
+            color: var(--dark);
+            font-size: 24px;
+        }
+
+        .doctor-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .doctor-tag {
+            background: var(--gray-light);
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
-            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .schedule-day {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .schedule-day.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .day-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .day-time {
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Responsive */
@@ -894,6 +1436,7 @@
             .hero-content {
                 grid-template-columns: 1fr;
                 text-align: center;
+                gap: 40px;
             }
             
             .hero-text {
@@ -902,15 +1445,43 @@
             
             .hero-actions {
                 justify-content: center;
+                flex-wrap: wrap;
             }
             
-            .doctors-filters {
-                grid-template-columns: 1fr;
+            .map-layout {
+                flex-direction: column;
+                height: auto;
             }
             
-            .featured-tip {
-                grid-template-columns: 1fr;
-                text-align: center;
+            .results-sidebar {
+                min-width: 100%;
+                max-width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--border);
+                max-height: 300px;
+            }
+            
+            .map-container {
+                min-height: 400px;
+                height: 400px;
+            }
+
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input-container {
+                min-width: 100%;
+            }
+
+            .search-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .service-card {
+                min-height: 350px;
             }
         }
 
@@ -925,6 +1496,7 @@
             
             .hero-actions {
                 flex-direction: column;
+                width: 100%;
             }
             
             .btn-large {
@@ -940,12 +1512,78 @@
                 padding: 20px;
             }
             
-            .modal-body {
-                padding: 20px;
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
             }
             
-            .doctors-modal-grid,
-            .tips-modal-grid {
+            .nav-links {
+                gap: 16px;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-actions {
+                flex-direction: column;
+            }
+
+            .search-actions .btn {
+                width: 100%;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-card {
+                min-height: auto;
+                padding: 30px;
+            }
+
+            .emergency-content h2 {
+                font-size: 28px;
+            }
+
+            .emergency-content p {
+                font-size: 16px;
+            }
+
+            .doctors-modal-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctors-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding-right: 0;
+                padding-bottom: 20px;
+                max-height: 200px;
+            }
+            
+            .doctor-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .tips-categories {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            
+            .tips-category-section.active {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctor-details-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -962,6 +1600,55 @@
             .section-title {
                 font-size: 28px;
             }
+            
+            .modal-content {
+                margin: 0;
+                border-radius: 0;
+                max-height: 100vh;
+                height: 100vh;
+                width: 100%;
+            }
+
+            .navbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 15px 0;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+                gap: 10px;
+            }
+
+            .auth-buttons {
+                order: 2;
+            }
+
+            .service-card {
+                padding: 24px;
+            }
+
+            .emergency-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 16px 24px;
+            }
+        }
+
+        /* Map Search Box */
+        .leaflet-control-geocoder {
+            border-radius: 8px !important;
+            box-shadow: var(--shadow) !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .leaflet-control-geocoder-form input {
+            padding: 10px 12px !important;
+            border-radius: 8px !important;
+            font-family: 'Inter', sans-serif !important;
         }
     </style>
 </head>
@@ -1014,8 +1701,8 @@
                             <button class="btn btn-primary btn-large" onclick="scrollToSection('services')">
                                 <i class="fas fa-play-circle"></i> Get Started
                             </button>
-                            <button class="btn btn-outline btn-large" onclick="scrollToSection('doctors')">
-                                <i class="fas fa-info-circle"></i> Learn More
+                            <button class="btn btn-outline btn-large" onclick="openMapFeature()">
+                                <i class="fas fa-map-marked-alt"></i> Open Medical Map
                             </button>
                         </div>
                     </div>
@@ -1050,8 +1737,8 @@
                             <i class="fas fa-comment-medical"></i>
                         </div>
                         <h3>Symptom Analysis</h3>
-                        <p>Enter symptoms via text, voice, or selection. Receive instant condition predictions with risk assessment and actionable recommendations.</p>
-                        <button class="btn btn-primary" style="width: 100%;">
+                        <p>Enter symptoms via text, pdf or image. Receive instant condition predictions with risk assessment and actionable recommendations.</p>
+                        <button class="btn btn-primary">
                             <i class="fas fa-arrow-right"></i> Try Symptom Checker
                         </button>
                     </div>
@@ -1063,42 +1750,44 @@
                         </div>
                         <h3>Prescription Decoder</h3>
                         <p>Upload or type prescriptions to understand medication usage, dosage, side effects, and find affordable alternatives.</p>
-                        <button class="btn btn-primary" style="width: 100%;">
+                        <button class="btn btn-primary">
                             <i class="fas fa-arrow-right"></i> Read Prescription
                         </button>
                     </div>
                     
-                    <!-- Nearby Clinics -->
-                    <div class="service-card" onclick="openNearbyClinics()">
+                    <!-- Live Medical Map -->
+                    <div class="service-card" onclick="openMapFeature()">
                         <div class="service-icon">
-                            <i class="fas fa-map-marker-alt"></i>
+                            <i class="fas fa-map-marked-alt"></i>
                         </div>
-                        <h3>Find Medical Facilities</h3>
-                        <p>Locate nearby clinics, pharmacies, and hospitals with real-time availability, directions, and contact information.</p>
-                        <button class="btn btn-primary" style="width: 100%;">
-                            <i class="fas fa-arrow-right"></i> Find Nearby
+                        <h3>Live Medical Map</h3>
+                        <p>Find nearby hospitals, clinics, and specialists with real-time filtering by specialty. Get directions, check availability, and view ratings.</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> Open Medical Map
                         </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Doctors Section -->
+        <!-- Enhanced Doctors Section -->
         <section class="doctors-section" id="doctors">
             <div class="container">
                 <div class="section-header">
                     <div class="section-label">Healthcare Professionals</div>
                     <h2 class="section-title">Connect with Certified Doctors</h2>
-                    <p class="section-subtitle">Access qualified medical professionals for virtual consultations</p>
+                    <p class="section-subtitle">Access qualified medical professionals for virtual consultations and in-person visits</p>
                 </div>
                 
                 <div class="doctors-grid">
-                    <div class="doctor-card">
+                    <!-- Doctor 1 -->
+                    <div class="doctor-card" id="doctor-card-1">
                         <div class="doctor-icon">
                             <i class="fas fa-user-md"></i>
                         </div>
                         <h3>Dr. Sarah Johnson</h3>
-                        <p class="doctor-specialty">General Physician</p>
+                        <p class="doctor-specialty">General Physician & Family Medicine</p>
+                        <p class="doctor-experience"><i class="fas fa-briefcase"></i> 12+ years experience</p>
                         <div class="doctor-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -1107,17 +1796,47 @@
                             <i class="fas fa-star-half-alt"></i>
                             4.7 (120 reviews)
                         </div>
-                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                        <button class="btn btn-primary" onclick="toggleDoctorDetails(1)">
                             <i class="fas fa-calendar-alt"></i> View Profile
                         </button>
+                        
+                        <div class="doctor-details-grid">
+                            <div class="detail-item">
+                                <strong>Education</strong>
+                                <span>MD, AIIMS Delhi</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Languages</strong>
+                                <span>English, Hindi, Telugu</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Consultation Fee</strong>
+                                <span>₹500 - ₹800</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Availability</strong>
+                                <span>Mon-Sat: 9AM-6PM</span>
+                            </div>
+                        </div>
+                        
+                        <div class="doctor-actions">
+                            <button class="btn btn-primary" onclick="bookAppointment('Dr. Sarah Johnson')">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            <button class="btn btn-outline" onclick="openVideoConsult('Dr. Sarah Johnson')">
+                                <i class="fas fa-video"></i> Video Consult
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="doctor-card">
+                    <!-- Doctor 2 -->
+                    <div class="doctor-card" id="doctor-card-2">
                         <div class="doctor-icon">
                             <i class="fas fa-user-md"></i>
                         </div>
                         <h3>Dr. Michael Chen</h3>
-                        <p class="doctor-specialty">Cardiologist</p>
+                        <p class="doctor-specialty">Cardiologist & Heart Specialist</p>
+                        <p class="doctor-experience"><i class="fas fa-briefcase"></i> 15+ years experience</p>
                         <div class="doctor-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -1126,17 +1845,47 @@
                             <i class="fas fa-star"></i>
                             5.0 (95 reviews)
                         </div>
-                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                        <button class="btn btn-primary" onclick="toggleDoctorDetails(2)">
                             <i class="fas fa-calendar-alt"></i> View Profile
                         </button>
+                        
+                        <div class="doctor-details-grid">
+                            <div class="detail-item">
+                                <strong>Education</strong>
+                                <span>DM Cardiology, CMC Vellore</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Languages</strong>
+                                <span>English, Hindi, Tamil</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Consultation Fee</strong>
+                                <span>₹1500 - ₹2000</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Availability</strong>
+                                <span>Tue-Sun: 10AM-7PM</span>
+                            </div>
+                        </div>
+                        
+                        <div class="doctor-actions">
+                            <button class="btn btn-primary" onclick="bookAppointment('Dr. Michael Chen')">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            <button class="btn btn-outline" onclick="openVideoConsult('Dr. Michael Chen')">
+                                <i class="fas fa-video"></i> Video Consult
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="doctor-card">
+                    <!-- Doctor 3 -->
+                    <div class="doctor-card" id="doctor-card-3">
                         <div class="doctor-icon">
                             <i class="fas fa-user-md"></i>
                         </div>
                         <h3>Dr. Priya Sharma</h3>
-                        <p class="doctor-specialty">Pediatrician</p>
+                        <p class="doctor-specialty">Pediatrician & Child Specialist</p>
+                        <p class="doctor-experience"><i class="fas fa-briefcase"></i> 10+ years experience</p>
                         <div class="doctor-rating">
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
@@ -1145,14 +1894,91 @@
                             <i class="fas fa-star"></i>
                             5.0 (210 reviews)
                         </div>
-                        <button class="btn btn-primary" onclick="openDoctorsModal()">
+                        <button class="btn btn-primary" onclick="toggleDoctorDetails(3)">
                             <i class="fas fa-calendar-alt"></i> View Profile
                         </button>
+                        
+                        <div class="doctor-details-grid">
+                            <div class="detail-item">
+                                <strong>Education</strong>
+                                <span>MD Pediatrics, PGIMER</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Languages</strong>
+                                <span>English, Hindi, Punjabi</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Consultation Fee</strong>
+                                <span>₹700 - ₹1000</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Availability</strong>
+                                <span>Mon-Fri: 8AM-5PM</span>
+                            </div>
+                        </div>
+                        
+                        <div class="doctor-actions">
+                            <button class="btn btn-primary" onclick="bookAppointment('Dr. Priya Sharma')">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            <button class="btn btn-outline" onclick="openVideoConsult('Dr. Priya Sharma')">
+                                <i class="fas fa-video"></i> Video Consult
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Doctor 4 -->
+                    <div class="doctor-card" id="doctor-card-4">
+                        <div class="doctor-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <h3>Dr. Rajesh Kumar</h3>
+                        <p class="doctor-specialty">Orthopedic Surgeon</p>
+                        <p class="doctor-experience"><i class="fas fa-briefcase"></i> 18+ years experience</p>
+                        <div class="doctor-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            4.9 (180 reviews)
+                        </div>
+                        <button class="btn btn-primary" onclick="toggleDoctorDetails(4)">
+                            <i class="fas fa-calendar-alt"></i> View Profile
+                        </button>
+                        
+                        <div class="doctor-details-grid">
+                            <div class="detail-item">
+                                <strong>Education</strong>
+                                <span>MS Ortho, AIIMS Delhi</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Languages</strong>
+                                <span>English, Hindi, Bengali</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Consultation Fee</strong>
+                                <span>₹1200 - ₹1800</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Availability</strong>
+                                <span>Wed-Sun: 11AM-8PM</span>
+                            </div>
+                        </div>
+                        
+                        <div class="doctor-actions">
+                            <button class="btn btn-primary" onclick="bookAppointment('Dr. Rajesh Kumar')">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            <button class="btn btn-outline" onclick="openVideoConsult('Dr. Rajesh Kumar')">
+                                <i class="fas fa-video"></i> Video Consult
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
                 <button class="btn btn-outline btn-view-all" onclick="openDoctorsModal()">
-                    <i class="fas fa-search"></i> Browse All Doctors
+                    <i class="fas fa-search"></i> Browse All Doctors (50+)
                 </button>
             </div>
         </section>
@@ -1166,14 +1992,14 @@
                     <button class="emergency-btn" onclick="callEmergency()">
                         <i class="fas fa-phone-alt"></i> Call Emergency: 911
                     </button>
-                    <p style="margin-top: 20px; font-size: 14px; color: #7f1d1d;">
-                        <i class="fas fa-info-circle"></i> OpenCare provides informational guidance only. In emergencies, contact local emergency services.
+                    <p class="emergency-note">
+                        <i class="fas fa-info-circle"></i> OpenCare provides informational guidance only. In emergencies, contact local emergency services immediately.
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- Health Tips Section -->
+        <!-- Enhanced Health Tips Section - FIXED LAYOUT -->
         <section class="tips-section" id="tips">
             <div class="container">
                 <div class="section-header">
@@ -1182,58 +2008,203 @@
                     <p class="section-subtitle">Practical advice for maintaining optimal health and wellness</p>
                 </div>
                 
-                <div class="tips-grid">
-                    <div class="tip-card">
-                        <div class="tip-icon">
-                            <i class="fas fa-heartbeat"></i>
-                        </div>
-                        <h3>Cardiovascular Health</h3>
-                        <p>Regular aerobic exercise, heart-healthy diet, stress management, and regular check-ups maintain optimal heart function.</p>
-                    </div>
-                    
-                    <div class="tip-card">
-                        <div class="tip-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <h3>Mental Wellness</h3>
-                        <p>Practice mindfulness, maintain social connections, prioritize sleep, and seek professional support when needed.</p>
-                    </div>
-                    
-                    <div class="tip-card">
-                        <div class="tip-icon">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <h3>Physical Fitness</h3>
-                        <p>Combine cardio, strength training, and flexibility exercises. Aim for 150 minutes of moderate activity weekly.</p>
-                    </div>
-                    
-                    <div class="tip-card">
+                <!-- Category Filters -->
+                <div class="tips-categories">
+                    <button class="category-btn active" onclick="filterTips('all')">All Tips</button>
+                    <button class="category-btn" onclick="filterTips('nutrition')">Nutrition</button>
+                    <button class="category-btn" onclick="filterTips('fitness')">Fitness</button>
+                    <button class="category-btn" onclick="filterTips('mental')">Mental Health</button>
+                    <button class="category-btn" onclick="filterTips('prevention')">Prevention</button>
+                </div>
+                
+                <!-- All Tips (Default) -->
+                <div class="tips-category-section active" id="tips-all">
+                    <div class="tip-card-expanded" data-category="nutrition">
+                        <div class="tip-badge">Nutrition</div>
                         <div class="tip-icon">
                             <i class="fas fa-apple-alt"></i>
                         </div>
-                        <h3>Nutrition Balance</h3>
-                        <p>Eat diverse fruits and vegetables, stay hydrated, limit processed foods, and practice mindful eating habits.</p>
+                        <h3>Balanced Diet Essentials</h3>
+                        <div class="tip-content">
+                            <p>Maintain a balanced diet with proper portions of all food groups:</p>
+                            <ul class="tip-points">
+                                <li>50% fruits and vegetables daily</li>
+                                <li>25% whole grains like brown rice, oats</li>
+                                <li>25% lean proteins (chicken, fish, legumes)</li>
+                                <li>Stay hydrated with 8-10 glasses of water</li>
+                                <li>Limit processed foods and added sugars</li>
+                            </ul>
+                        </div>
                     </div>
                     
-                    <div class="tip-card">
+                    <div class="tip-card-expanded" data-category="fitness">
+                        <div class="tip-badge">Fitness</div>
                         <div class="tip-icon">
-                            <i class="fas fa-bed"></i>
+                            <i class="fas fa-dumbbell"></i>
                         </div>
-                        <h3>Sleep Hygiene</h3>
-                        <p>Maintain consistent sleep schedule, create restful environment, limit screen time, and aim for 7-9 hours nightly.</p>
+                        <h3>Weekly Exercise Routine</h3>
+                        <div class="tip-content">
+                            <p>Achieve optimal fitness with this balanced weekly plan:</p>
+                            <ul class="tip-points">
+                                <li>150 minutes moderate cardio weekly</li>
+                                <li>2 days strength training</li>
+                                <li>Daily stretching for flexibility</li>
+                                <li>Incorporate balance exercises</li>
+                                <li>Take 10,000 steps daily</li>
+                            </ul>
+                        </div>
                     </div>
                     
-                    <div class="tip-card">
+                    <div class="tip-card-expanded" data-category="mental">
+                        <div class="tip-badge">Mental Health</div>
                         <div class="tip-icon">
-                            <i class="fas fa-lungs"></i>
+                            <i class="fas fa-brain"></i>
                         </div>
-                        <h3>Respiratory Care</h3>
-                        <p>Avoid pollutants, practice deep breathing, maintain indoor air quality, and engage in regular cardiovascular exercise.</p>
+                        <h3>Stress Management Techniques</h3>
+                        <div class="tip-content">
+                            <p>Effective strategies for managing daily stress:</p>
+                            <ul class="tip-points">
+                                <li>Practice 10-minute daily meditation</li>
+                                <li>Maintain regular sleep schedule</li>
+                                <li>Connect with loved ones regularly</li>
+                                <li>Take breaks during work hours</li>
+                                <li>Limit screen time before bed</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded" data-category="prevention">
+                        <div class="tip-badge">Prevention</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Seasonal Illness Prevention</h3>
+                        <div class="tip-content">
+                            <p>Stay healthy during seasonal changes:</p>
+                            <ul class="tip-points">
+                                <li>Get annual flu vaccination</li>
+                                <li>Wash hands frequently with soap</li>
+                                <li>Maintain indoor air quality</li>
+                                <li>Boost immunity with Vitamin C foods</li>
+                                <li>Avoid crowded places during outbreaks</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded" data-category="nutrition">
+                        <div class="tip-badge">Nutrition</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>Heart-Healthy Eating</h3>
+                        <div class="tip-content">
+                            <p>Dietary choices for cardiovascular health:</p>
+                            <ul class="tip-points">
+                                <li>Choose whole grains over refined</li>
+                                <li>Include omega-3 rich foods (fish, walnuts)</li>
+                                <li>Limit saturated and trans fats</li>
+                                <li>Reduce sodium intake to under 2300mg daily</li>
+                                <li>Increase soluble fiber from oats and beans</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded" data-category="fitness">
+                        <div class="tip-badge">Fitness</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h3>Home Workout Essentials</h3>
+                        <div class="tip-content">
+                            <p>Create effective home workout routine:</p>
+                            <ul class="tip-points">
+                                <li>Bodyweight exercises (push-ups, squats)</li>
+                                <li>Resistance bands for strength training</li>
+                                <li>Yoga mat for floor exercises</li>
+                                <li>Water bottle for hydration</li>
+                                <li>Music for motivation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded" data-category="mental">
+                        <div class="tip-badge">Mental Health</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                        <h3>Morning Routine for Energy</h3>
+                        <div class="tip-content">
+                            <p>Start your day with these energy-boosting habits:</p>
+                            <ul class="tip-points">
+                                <li>Drink warm water with lemon</li>
+                                <li>15 minutes of morning sunlight</li>
+                                <li>Light stretching or yoga</li>
+                                <li>Healthy protein-rich breakfast</li>
+                                <li>Plan your day ahead</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded" data-category="prevention">
+                        <div class="tip-badge">Prevention</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <h3>Digital Eye Strain Prevention</h3>
+                        <div class="tip-content">
+                            <p>Protect your eyes during screen time:</p>
+                            <ul class="tip-points">
+                                <li>Follow 20-20-20 rule (20 sec break every 20 min)</li>
+                                <li>Adjust screen brightness</li>
+                                <li>Use blue light filters</li>
+                                <li>Blink frequently</li>
+                                <li>Position screen at arm's length</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nutrition Tips -->
+                <div class="tips-category-section" id="tips-nutrition">
+                    <div class="tip-card-expanded">
+                        <div class="tip-badge">Nutrition</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <h3>Hydration Guidelines</h3>
+                        <div class="tip-content">
+                            <p>Proper hydration is essential for all bodily functions:</p>
+                            <ul class="tip-points">
+                                <li>Drink 35ml water per kg body weight</li>
+                                <li>Consume water-rich fruits and vegetables</li>
+                                <li>Monitor urine color (pale yellow ideal)</li>
+                                <li>Increase intake during exercise</li>
+                                <li>Limit sugary and caffeinated drinks</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card-expanded">
+                        <div class="tip-badge">Nutrition</div>
+                        <div class="tip-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3>Portion Control Methods</h3>
+                        <div class="tip-content">
+                            <p>Simple techniques for proper portion sizes:</p>
+                            <ul class="tip-points">
+                                <li>Use smaller plates and bowls</li>
+                                <li>Fill half plate with vegetables</li>
+                                <li>Protein portion = palm size</li>
+                                <li>Carb portion = fist size</li>
+                                <li>Fats portion = thumb size</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
                 <button class="btn btn-outline btn-view-all" onclick="openHealthTipsModal()">
-                    <i class="fas fa-book-medical"></i> View All Health Tips
+                    <i class="fas fa-book-medical"></i> Explore 100+ Health Tips
                 </button>
             </div>
         </section>
@@ -1260,7 +2231,7 @@
                     <ul class="footer-links">
                         <li><a onclick="openSymptomChecker()"><i class="fas fa-chevron-right"></i> Symptom Checker</a></li>
                         <li><a onclick="openPrescriptionReader()"><i class="fas fa-chevron-right"></i> Prescription Reader</a></li>
-                        <li><a onclick="openNearbyClinics()"><i class="fas fa-chevron-right"></i> Find Nearby Clinics</a></li>
+                        <li><a onclick="openMapFeature()"><i class="fas fa-chevron-right"></i> Medical Map</a></li>
                         <li><a onclick="openHealthTipsModal()"><i class="fas fa-chevron-right"></i> Health Tips</a></li>
                     </ul>
                 </div>
@@ -1279,8 +2250,8 @@
                     <h3>Contact</h3>
                     <ul class="footer-links">
                         <li><a href="#"><i class="fas fa-envelope"></i> support@opencare.com</a></li>
-                        <li><a href="#"><i class="fas fa-phone"></i> +1 (800) 123-4567</a></li>
-                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> San Francisco, CA</a></li>
+                        <li><a href="#"><i class="fas fa-phone"></i> +91 8000 123 456</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Hyderabad, India</a></li>
                     </ul>
                 </div>
             </div>
@@ -1291,456 +2262,1835 @@
         </div>
     </footer>
 
-    <!-- Doctors Directory Modal -->
-    <div id="doctorsModal" class="modal-overlay">
-        <div class="modal-content">
+    <!-- Medical Map Modal -->
+    <div id="mapModal" class="modal-overlay">
+        <div class="modal-content" style="height: 90vh;">
             <div class="modal-header">
-                <button class="close-modal" onclick="closeDoctorsModal()">
+                <button class="close-modal" onclick="closeMapModal()">
                     <i class="fas fa-times"></i>
                 </button>
-                <h1>Find Your Doctor</h1>
-                <p>Connect with certified healthcare professionals across various specialties. Book appointments or schedule virtual consultations.</p>
+                <h1><i class="fas fa-map-marked-alt"></i> Medical Facilities Map</h1>
+                <p>Find hospitals, clinics, pharmacies, and specialists near you. Filter by type, specialization, and availability.</p>
             </div>
             
             <div class="modal-body">
-                <!-- Filters -->
-                <div class="doctors-filters">
-                    <div class="filter-group">
-                        <label>Search Doctors</label>
-                        <input type="text" class="search-input" placeholder="Search by name, specialty, or condition...">
+                <!-- Search and Controls Bar -->
+                <div class="search-container">
+                    <div class="search-input-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" 
+                               id="locationSearch" 
+                               class="search-input" 
+                               placeholder="Search for hospitals, clinics, or pharmacies... (press Enter)">
                     </div>
-                    <div class="filter-group">
-                        <label>Specialty</label>
-                        <select class="filter-select">
-                            <option value="">All Specialties</option>
-                            <option value="general">General Physician</option>
-                            <option value="cardio">Cardiologist</option>
-                            <option value="pedia">Pediatrician</option>
-                            <option value="derma">Dermatologist</option>
-                            <option value="neuro">Neurologist</option>
-                            <option value="ortho">Orthopedist</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Availability</label>
-                        <select class="filter-select">
-                            <option value="">Any Time</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="online">Online Now</option>
-                        </select>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" onclick="centerOnUserLocation()">
+                            <i class="fas fa-location-arrow"></i> My Location
+                        </button>
+                        <button class="btn" id="filterToggleBtn" onclick="toggleFilterPanel()" style="background: var(--gray-light); color: var(--dark);">
+                            <i class="fas fa-filter"></i> Filters
+                        </button>
                     </div>
                 </div>
 
-                <!-- Doctors Grid -->
-                <div class="doctors-modal-grid">
-                    <!-- Doctor 1 -->
-                    <div class="doctor-card">
-                        <div class="doctor-icon">
-                            <i class="fas fa-user-md"></i>
+                <!-- Filter Panel -->
+                <div id="filterPanel" class="filter-panel">
+                    <div class="filter-panel-content">
+                        <h3 style="margin-bottom: 15px; font-size: 16px; color: var(--dark);">Filter Facilities</h3>
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label><i class="fas fa-hospital"></i> Facility Type</label>
+                                <select id="facilityType" class="filter-select" onchange="applyFilters()">
+                                    <option value="all">All Facilities</option>
+                                    <option value="hospital">Hospitals</option>
+                                    <option value="clinic">Clinics</option>
+                                    <option value="pharmacy">Pharmacies</option>
+                                    <option value="doctors">Doctors</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label><i class="fas fa-user-md"></i> Specialization</label>
+                                <select id="specializationFilter" class="filter-select" onchange="applyFilters()">
+                                    <option value="all">All Specialties</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label><i class="fas fa-ruler"></i> Distance (km)</label>
+                                <select id="distanceFilter" class="filter-select" onchange="applyFilters()">
+                                    <option value="2">Within 2 km</option>
+                                    <option value="5" selected>Within 5 km</option>
+                                    <option value="10">Within 10 km</option>
+                                    <option value="25">Within 25 km</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label><i class="fas fa-clock"></i> Availability</label>
+                                <select id="availabilityFilter" class="filter-select" onchange="applyFilters()">
+                                    <option value="all">Any Time</option>
+                                    <option value="open">Open Now</option>
+                                    <option value="emergency">Emergency</option>
+                                </select>
+                            </div>
                         </div>
-                        <h3>Dr. Sarah Johnson</h3>
-                        <p class="doctor-specialty">General Physician</p>
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            4.7 (120 reviews)
-                        </div>
-                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                            Specializes in internal medicine and preventive care. Available for in-person and virtual consultations.
-                        </p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('sarah-johnson')">
-                                <i class="fas fa-calendar-alt"></i> Book
+                        
+                        <div class="filter-actions">
+                            <button class="btn btn-outline" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Clear All
                             </button>
-                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('sarah-johnson')">
-                                <i class="fas fa-user"></i> Profile
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Doctor 2 -->
-                    <div class="doctor-card">
-                        <div class="doctor-icon">
-                            <i class="fas fa-user-md"></i>
-                        </div>
-                        <h3>Dr. Michael Chen</h3>
-                        <p class="doctor-specialty">Cardiologist</p>
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            5.0 (95 reviews)
-                        </div>
-                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                            Heart specialist with expertise in cardiovascular diseases, hypertension, and preventive cardiology.
-                        </p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('michael-chen')">
-                                <i class="fas fa-calendar-alt"></i> Book
-                            </button>
-                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('michael-chen')">
-                                <i class="fas fa-user"></i> Profile
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Doctor 3 -->
-                    <div class="doctor-card">
-                        <div class="doctor-icon">
-                            <i class="fas fa-user-md"></i>
-                        </div>
-                        <h3>Dr. Priya Sharma</h3>
-                        <p class="doctor-specialty">Pediatrician</p>
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            5.0 (210 reviews)
-                        </div>
-                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                            Children's health specialist with expertise in growth, development, and childhood illnesses.
-                        </p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('priya-sharma')">
-                                <i class="fas fa-calendar-alt"></i> Book
-                            </button>
-                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('priya-sharma')">
-                                <i class="fas fa-user"></i> Profile
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Doctor 4 -->
-                    <div class="doctor-card">
-                        <div class="doctor-icon">
-                            <i class="fas fa-user-md"></i>
-                        </div>
-                        <h3>Dr. Robert Williams</h3>
-                        <p class="doctor-specialty">Dermatologist</p>
-                        <div class="doctor-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            4.6 (85 reviews)
-                        </div>
-                        <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                            Skin health specialist with expertise in dermatology, cosmetic procedures, and skin cancer screening.
-                        </p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn btn-primary" style="flex: 1;" onclick="bookConsultation('robert-williams')">
-                                <i class="fas fa-calendar-alt"></i> Book
-                            </button>
-                            <button class="btn btn-outline" style="flex: 1;" onclick="viewProfile('robert-williams')">
-                                <i class="fas fa-user"></i> Profile
+                            <button class="btn btn-primary" onclick="applyFilters()">
+                                <i class="fas fa-check"></i> Apply Filters
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Load More Button -->
-                <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn btn-outline" onclick="loadMoreDoctors()">
-                        <i class="fas fa-plus"></i> Load More Doctors
-                    </button>
+                <!-- Map and Results Layout -->
+                <div class="map-layout">
+                    <!-- Map Container -->
+                    <div class="map-container">
+                        <div id="map"></div>
+                        
+                        <!-- Loading overlay -->
+                        <div id="mapLoading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 1000;">
+                            <div style="text-align: center; padding: 20px;">
+                                <i class="fas fa-map-marked-alt" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+                                <h3 style="margin-bottom: 10px;">Loading Nearby Facilities...</h3>
+                                <p style="color: var(--gray); margin-bottom: 20px;">Searching for hospitals, clinics, and pharmacies near you</p>
+                                <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid var(--gray-light); border-top: 4px solid var(--primary); border-radius: 50%; margin: 0 auto;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Sidebar -->
+                    <div class="results-sidebar">
+                        <div class="results-sidebar-header">
+                            <h3 style="margin: 0; font-size: 18px; color: var(--dark);">
+                                <i class="fas fa-list-ul"></i> Nearby Facilities
+                                <span id="resultsCount" style="font-size: 14px; color: var(--gray); font-weight: normal; margin-left: 8px;">(0 found)</span>
+                            </h3>
+                        </div>
+                        
+                        <div class="results-sidebar-content">
+                            <div id="resultsList">
+                                <div class="no-results">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <h4 style="margin-bottom: 8px; color: var(--gray);">No facilities found</h4>
+                                    <p style="font-size: 14px; color: var(--gray);">Use the search or click "My Location" to find healthcare facilities near you.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Health Tips Modal -->
+    <!-- New Doctors Modal with FIXED filtering -->
+    <div id="doctorsModal" class="modal-overlay">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <button class="close-modal" onclick="closeDoctorsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h1><i class="fas fa-user-md"></i> Browse All Doctors</h1>
+                <p>Connect with certified medical professionals across various specialties</p>
+            </div>
+            
+            <div class="doctors-modal-content">
+                <!-- Doctors Sidebar -->
+                <div class="doctors-sidebar">
+                    <div class="tips-search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="doctorSearch" class="tips-search" placeholder="Search doctors by name or specialty..." onkeyup="searchDoctors()">
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px 0; color: var(--dark);">Specialties</h4>
+                    <div style="margin-bottom: 20px;">
+                        <button class="category-btn active" onclick="filterModalDoctors('all')" style="margin: 5px;">All</button>
+                        <button class="category-btn" onclick="filterModalDoctors('cardiology')" style="margin: 5px;">Cardiology</button>
+                        <button class="category-btn" onclick="filterModalDoctors('pediatrics')" style="margin: 5px;">Pediatrics</button>
+                        <button class="category-btn" onclick="filterModalDoctors('orthopedics')" style="margin: 5px;">Orthopedics</button>
+                        <button class="category-btn" onclick="filterModalDoctors('neurology')" style="margin: 5px;">Neurology</button>
+                        <button class="category-btn" onclick="filterModalDoctors('dermatology')" style="margin: 5px;">Dermatology</button>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px 0; color: var(--dark);">Available Doctors</h4>
+                    <div id="doctorsList" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Doctor list items will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <!-- Doctor Detail View -->
+                <div class="doctor-detail-view">
+                    <div id="doctorDetailContent">
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-user-md" style="font-size: 60px; color: var(--gray-light); margin-bottom: 20px;"></i>
+                            <h3 style="color: var(--gray);">Select a doctor to view details</h3>
+                            <p style="color: var(--gray);">Click on any doctor from the list to see their complete profile, availability, and booking options.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Health Tips Modal -->
     <div id="healthTipsModal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content large">
             <div class="modal-header">
                 <button class="close-modal" onclick="closeHealthTipsModal()">
                     <i class="fas fa-times"></i>
                 </button>
-                <h1>Health & Wellness Tips</h1>
-                <p>Evidence-based health advice from medical professionals. Learn how to maintain and improve your health through lifestyle choices.</p>
+                <h1><i class="fas fa-book-medical"></i> Comprehensive Health Tips Library</h1>
+                <p>Browse our collection of 100+ evidence-based health and wellness tips</p>
             </div>
             
             <div class="modal-body">
-                <!-- Categories -->
-                <div class="tips-categories">
-                    <button class="category-btn active" onclick="filterTips('all')">
-                        <i class="fas fa-star"></i> All Tips
-                    </button>
-                    <button class="category-btn" onclick="filterTips('heart')">
-                        <i class="fas fa-heart"></i> Heart Health
-                    </button>
-                    <button class="category-btn" onclick="filterTips('mental')">
-                        <i class="fas fa-brain"></i> Mental Wellness
-                    </button>
-                    <button class="category-btn" onclick="filterTips('fitness')">
-                        <i class="fas fa-dumbbell"></i> Fitness
-                    </button>
-                    <button class="category-btn" onclick="filterTips('nutrition')">
-                        <i class="fas fa-apple-alt"></i> Nutrition
-                    </button>
-                    <button class="category-btn" onclick="filterTips('sleep')">
-                        <i class="fas fa-bed"></i> Sleep
-                    </button>
-                    <button class="category-btn" onclick="filterTips('prevention')">
-                        <i class="fas fa-shield-alt"></i> Prevention
-                    </button>
+                <div class="tips-search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tipsSearch" class="tips-search" placeholder="Search health tips... (e.g., 'sleep', 'exercise', 'diet')" onkeyup="searchTips()">
                 </div>
-
-                <!-- Featured Tip -->
-                <div class="featured-tip">
-                    <div class="featured-content">
-                        <h2>Daily Exercise for Heart Health</h2>
-                        <p>Just 30 minutes of moderate exercise daily can reduce your risk of heart disease by 30%. Combine cardio, strength training, and flexibility exercises for optimal results.</p>
-                        <button class="btn" style="background: white; color: var(--primary);" onclick="readFullTip('exercise-heart')">
-                            <i class="fas fa-book-open"></i> Read Full Article
-                        </button>
-                    </div>
-                    <div class="featured-icon">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
+                
+                <div class="tips-categories" style="margin: 20px 0;">
+                    <button class="category-btn active" onclick="filterModalTips('all')">All Categories</button>
+                    <button class="category-btn" onclick="filterModalTips('diet')">Diet & Nutrition</button>
+                    <button class="category-btn" onclick="filterModalTips('exercise')">Exercise & Fitness</button>
+                    <button class="category-btn" onclick="filterModalTips('mental')">Mental Wellness</button>
+                    <button class="category-btn" onclick="filterModalTips('prevention')">Disease Prevention</button>
+                    <button class="category-btn" onclick="filterModalTips('lifestyle')">Healthy Lifestyle</button>
+                    <button class="category-btn" onclick="filterModalTips('aging')">Healthy Aging</button>
                 </div>
-
-                <!-- Tips Grid -->
-                <div class="tips-modal-grid">
-                    <!-- Tip 1 -->
-                    <div class="tip-modal-card" data-category="heart">
-                        <div class="tip-category-badge">Heart Health</div>
-                        <div class="tip-icon">
-                            <i class="fas fa-heartbeat"></i>
-                        </div>
-                        <h2>Managing Blood Pressure</h2>
-                        <p style="color: var(--gray); margin: 15px 0;">
-                            Learn how to maintain healthy blood pressure through diet, exercise, and stress management techniques.
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 5 min read</span>
-                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('blood-pressure')">
-                                Read More <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tip 2 -->
-                    <div class="tip-modal-card" data-category="mental">
-                        <div class="tip-category-badge">Mental Wellness</div>
-                        <div class="tip-icon">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <h2>Stress Reduction Techniques</h2>
-                        <p style="color: var(--gray); margin: 15px 0;">
-                            Practical mindfulness exercises, breathing techniques, and lifestyle adjustments to manage daily stress.
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 4 min read</span>
-                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('stress-reduction')">
-                                Read More <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tip 3 -->
-                    <div class="tip-modal-card" data-category="nutrition">
-                        <div class="tip-category-badge">Nutrition</div>
-                        <div class="tip-icon">
-                            <i class="fas fa-apple-alt"></i>
-                        </div>
-                        <h2>Balanced Diet Essentials</h2>
-                        <p style="color: var(--gray); margin: 15px 0;">
-                            Understanding macronutrients, portion control, and how to create balanced meals for optimal health.
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 6 min read</span>
-                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('balanced-diet')">
-                                Read More <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tip 4 -->
-                    <div class="tip-modal-card" data-category="sleep">
-                        <div class="tip-category-badge">Sleep</div>
-                        <div class="tip-icon">
-                            <i class="fas fa-bed"></i>
-                        </div>
-                        <h2>Improving Sleep Quality</h2>
-                        <p style="color: var(--gray); margin: 15px 0;">
-                            Creating a sleep-conducive environment and establishing routines for better rest and recovery.
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                            <span style="font-size: 14px; color: var(--gray);"><i class="fas fa-clock"></i> 5 min read</span>
-                            <a style="color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer;" onclick="readFullTip('sleep-quality')">
-                                Read More <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
+                
+                <div class="tips-modal-grid" id="tipsModalContent">
+                    <!-- Tips will be dynamically loaded here -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Service functions
-        function openSymptomChecker() {
-            alert('Symptom Checker would open here. Connect to your Python backend.');
-            // window.open('http://localhost:5000/symptom-checker', '_blank');
-        }
-
-        function openPrescriptionReader() {
-            // Opens your Streamlit prescription reader app
-            window.open('https://prescriptionreader.streamlit.app/', '_blank');
-        }
-
-        function openNearbyClinics() {
-            alert('Nearby Clinics would open here. Connect to your Python backend.');
-            // window.open('http://localhost:5000/nearby-clinics', '_blank');
-        }
-
-        function callEmergency() {
-            if (confirm('In a real emergency, please call 911 immediately.\n\nFor demonstration: Show emergency resources?')) {
-                alert('Emergency resources page would open. Remember: Always call 911 for real emergencies.');
+        // ==================== ENHANCED DOCTORS FUNCTIONALITY ====================
+        
+        // Toggle doctor details in the main section
+        function toggleDoctorDetails(doctorId) {
+            const doctorCard = document.getElementById('doctor-card-' + doctorId);
+            const isExpanded = doctorCard.classList.contains('expanded');
+            
+            // Close all other doctor cards
+            document.querySelectorAll('.doctor-card').forEach(card => {
+                card.classList.remove('expanded');
+            });
+            
+            // Toggle this one
+            if (!isExpanded) {
+                doctorCard.classList.add('expanded');
+                // Scroll to show the details
+                doctorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
-
-        // Modal functions
+        
+        // Book appointment function
+        function bookAppointment(doctorName) {
+            alert(`Booking appointment with ${doctorName}\n\nThis would open a scheduling interface with available time slots.`);
+        }
+        
+        // Video consultation function
+        function openVideoConsult(doctorName) {
+            alert(`Starting video consultation with ${doctorName}\n\nThis would connect to a secure video call platform.`);
+        }
+        
+        // Open doctors modal with expanded view - FIXED: Added loadDoctorsData() call
         function openDoctorsModal() {
             document.getElementById('doctorsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Load sample doctors data - FIX: This was missing!
+            loadDoctorsData();
         }
-
+        
         function closeDoctorsModal() {
             document.getElementById('doctorsModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-
+        
+        // Load sample doctors data - FIXED: More doctors added
+        function loadDoctorsData() {
+            const doctors = [
+                {
+                    id: 1,
+                    name: "Dr. Sarah Johnson",
+                    specialty: "General Physician",
+                    rating: 4.7,
+                    reviews: 120,
+                    experience: "12 years",
+                    education: "MD, AIIMS Delhi",
+                    languages: ["English", "Hindi", "Telugu"],
+                    fee: "₹500 - ₹800",
+                    availability: "Mon-Sat: 9AM-6PM",
+                    description: "Specializes in preventive care, chronic disease management, and family medicine.",
+                    schedule: [
+                        { day: "Mon", time: "9AM-6PM", active: true },
+                        { day: "Tue", time: "9AM-6PM", active: true },
+                        { day: "Wed", time: "9AM-6PM", active: true },
+                        { day: "Thu", time: "9AM-6PM", active: true },
+                        { day: "Fri", time: "9AM-6PM", active: true },
+                        { day: "Sat", time: "9AM-2PM", active: true },
+                        { day: "Sun", time: "Closed", active: false }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "Dr. Michael Chen",
+                    specialty: "Cardiologist",
+                    rating: 5.0,
+                    reviews: 95,
+                    experience: "15 years",
+                    education: "DM Cardiology, CMC Vellore",
+                    languages: ["English", "Hindi", "Tamil"],
+                    fee: "₹1500 - ₹2000",
+                    availability: "Tue-Sun: 10AM-7PM",
+                    description: "Expert in interventional cardiology, heart failure management, and preventive cardiology.",
+                    schedule: [
+                        { day: "Mon", time: "Closed", active: false },
+                        { day: "Tue", time: "10AM-7PM", active: true },
+                        { day: "Wed", time: "10AM-7PM", active: true },
+                        { day: "Thu", time: "10AM-7PM", active: true },
+                        { day: "Fri", time: "10AM-7PM", active: true },
+                        { day: "Sat", time: "10AM-7PM", active: true },
+                        { day: "Sun", time: "10AM-5PM", active: true }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: "Dr. Priya Sharma",
+                    specialty: "Pediatrician",
+                    rating: 5.0,
+                    reviews: 210,
+                    experience: "10 years",
+                    education: "MD Pediatrics, PGIMER",
+                    languages: ["English", "Hindi", "Punjabi"],
+                    fee: "₹700 - ₹1000",
+                    availability: "Mon-Fri: 8AM-5PM",
+                    description: "Specializes in child development, vaccination, and pediatric emergency care.",
+                    schedule: [
+                        { day: "Mon", time: "8AM-5PM", active: true },
+                        { day: "Tue", time: "8AM-5PM", active: true },
+                        { day: "Wed", time: "8AM-5PM", active: true },
+                        { day: "Thu", time: "8AM-5PM", active: true },
+                        { day: "Fri", time: "8AM-5PM", active: true },
+                        { day: "Sat", time: "9AM-1PM", active: true },
+                        { day: "Sun", time: "Closed", active: false }
+                    ]
+                },
+                {
+                    id: 4,
+                    name: "Dr. Rajesh Kumar",
+                    specialty: "Orthopedic Surgeon",
+                    rating: 4.9,
+                    reviews: 180,
+                    experience: "18 years",
+                    education: "MS Ortho, AIIMS Delhi",
+                    languages: ["English", "Hindi", "Bengali"],
+                    fee: "₹1200 - ₹1800",
+                    availability: "Wed-Sun: 11AM-8PM",
+                    description: "Expert in joint replacement, sports injuries, and minimally invasive surgery.",
+                    schedule: [
+                        { day: "Mon", time: "Closed", active: false },
+                        { day: "Tue", time: "Closed", active: false },
+                        { day: "Wed", time: "11AM-8PM", active: true },
+                        { day: "Thu", time: "11AM-8PM", active: true },
+                        { day: "Fri", time: "11AM-8PM", active: true },
+                        { day: "Sat", time: "11AM-8PM", active: true },
+                        { day: "Sun", time: "11AM-6PM", active: true }
+                    ]
+                },
+                {
+                    id: 5,
+                    name: "Dr. Anjali Mehta",
+                    specialty: "Dermatologist",
+                    rating: 4.8,
+                    reviews: 145,
+                    experience: "9 years",
+                    education: "MD Dermatology, KGMU",
+                    languages: ["English", "Hindi", "Marathi"],
+                    fee: "₹1000 - ₹1500",
+                    availability: "Mon-Fri: 10AM-7PM",
+                    description: "Specializes in skin conditions, cosmetic dermatology, and laser treatments.",
+                    schedule: [
+                        { day: "Mon", time: "10AM-7PM", active: true },
+                        { day: "Tue", time: "10AM-7PM", active: true },
+                        { day: "Wed", time: "10AM-7PM", active: true },
+                        { day: "Thu", time: "10AM-7PM", active: true },
+                        { day: "Fri", time: "10AM-7PM", active: true },
+                        { day: "Sat", time: "10AM-4PM", active: true },
+                        { day: "Sun", time: "Closed", active: false }
+                    ]
+                },
+                {
+                    id: 6,
+                    name: "Dr. Robert Wilson",
+                    specialty: "Neurologist",
+                    rating: 4.9,
+                    reviews: 165,
+                    experience: "14 years",
+                    education: "DM Neurology, NIMHANS",
+                    languages: ["English", "Hindi", "Kannada"],
+                    fee: "₹1800 - ₹2500",
+                    availability: "Tue-Sat: 9AM-6PM",
+                    description: "Expert in neurological disorders, stroke management, and epilepsy treatment.",
+                    schedule: [
+                        { day: "Mon", time: "Closed", active: false },
+                        { day: "Tue", time: "9AM-6PM", active: true },
+                        { day: "Wed", time: "9AM-6PM", active: true },
+                        { day: "Thu", time: "9AM-6PM", active: true },
+                        { day: "Fri", time: "9AM-6PM", active: true },
+                        { day: "Sat", time: "9AM-4PM", active: true },
+                        { day: "Sun", time: "Closed", active: false }
+                    ]
+                },
+                {
+                    id: 7,
+                    name: "Dr. Sunita Patel",
+                    specialty: "Gynecologist",
+                    rating: 4.8,
+                    reviews: 190,
+                    experience: "11 years",
+                    education: "MD Obstetrics & Gynecology, JJ Hospital",
+                    languages: ["English", "Hindi", "Gujarati"],
+                    fee: "₹900 - ₹1400",
+                    availability: "Mon-Sat: 9AM-5PM",
+                    description: "Specializes in women's health, pregnancy care, and reproductive health.",
+                    schedule: [
+                        { day: "Mon", time: "9AM-5PM", active: true },
+                        { day: "Tue", time: "9AM-5PM", active: true },
+                        { day: "Wed", time: "9AM-5PM", active: true },
+                        { day: "Thu", time: "9AM-5PM", active: true },
+                        { day: "Fri", time: "9AM-5PM", active: true },
+                        { day: "Sat", time: "9AM-2PM", active: true },
+                        { day: "Sun", time: "Emergency Only", active: true }
+                    ]
+                },
+                {
+                    id: 8,
+                    name: "Dr. Arjun Singh",
+                    specialty: "ENT Specialist",
+                    rating: 4.7,
+                    reviews: 130,
+                    experience: "13 years",
+                    education: "MS ENT, PGIMER Chandigarh",
+                    languages: ["English", "Hindi", "Punjabi"],
+                    fee: "₹800 - ₹1200",
+                    availability: "Mon-Fri: 10AM-7PM",
+                    description: "Expert in ear, nose, and throat disorders, sinus treatments, and hearing issues.",
+                    schedule: [
+                        { day: "Mon", time: "10AM-7PM", active: true },
+                        { day: "Tue", time: "10AM-7PM", active: true },
+                        { day: "Wed", time: "10AM-7PM", active: true },
+                        { day: "Thu", time: "10AM-7PM", active: true },
+                        { day: "Fri", time: "10AM-7PM", active: true },
+                        { day: "Sat", time: "10AM-3PM", active: true },
+                        { day: "Sun", time: "Closed", active: false }
+                    ]
+                }
+            ];
+            
+            // Store doctors globally for filtering
+            window.allDoctors = doctors;
+            
+            // Populate doctors list
+            populateDoctorsList(doctors);
+        }
+        
+        // Populate doctors list
+        function populateDoctorsList(doctors) {
+            const doctorsList = document.getElementById('doctorsList');
+            doctorsList.innerHTML = '';
+            
+            doctors.forEach(doctor => {
+                const item = document.createElement('div');
+                item.className = 'doctor-list-item';
+                item.setAttribute('data-specialty', doctor.specialty.toLowerCase());
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="display: block;">${doctor.name}</strong>
+                            <span style="font-size: 13px; color: var(--gray);">${doctor.specialty}</span>
+                        </div>
+                        <span style="background: var(--success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                            ${doctor.rating} ★
+                        </span>
+                    </div>
+                    <div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
+                        <i class="fas fa-briefcase"></i> ${doctor.experience} • 
+                        <i class="fas fa-comment"></i> ${doctor.reviews} reviews
+                    </div>
+                `;
+                item.onclick = (e) => {
+                    showDoctorDetails(doctor);
+                    e.stopPropagation();
+                };
+                doctorsList.appendChild(item);
+            });
+            
+            // Select first doctor by default
+            if (doctors.length > 0) {
+                showDoctorDetails(doctors[0]);
+                // Mark first item as active
+                const firstItem = doctorsList.querySelector('.doctor-list-item');
+                if (firstItem) firstItem.classList.add('active');
+            }
+        }
+        
+        // Show doctor details in modal
+        function showDoctorDetails(doctor) {
+            const detailsDiv = document.getElementById('doctorDetailContent');
+            
+            // Create schedule HTML
+            let scheduleHTML = '';
+            doctor.schedule.forEach(day => {
+                scheduleHTML += `
+                    <div class="schedule-day ${day.active ? 'active' : ''}">
+                        <div class="day-name">${day.day}</div>
+                        <div class="day-time">${day.time}</div>
+                    </div>
+                `;
+            });
+            
+            // Create languages HTML
+            const languagesHTML = doctor.languages.map(lang => 
+                `<span class="doctor-tag">${lang}</span>`
+            ).join('');
+            
+            detailsDiv.innerHTML = `
+                <div class="doctor-header">
+                    <div class="doctor-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="doctor-info">
+                        <h2>${doctor.name}</h2>
+                        <div style="color: var(--primary); font-weight: 500; margin-bottom: 5px;">${doctor.specialty}</div>
+                        <div style="color: var(--warning); margin-bottom: 5px;">
+                            ${'★'.repeat(Math.floor(doctor.rating))}${doctor.rating % 1 >= 0.5 ? '½' : ''}
+                            <span style="color: var(--gray); font-size: 14px;"> (${doctor.reviews} reviews)</span>
+                        </div>
+                        <div class="doctor-tags">
+                            <span class="doctor-tag">${doctor.experience} experience</span>
+                            <span class="doctor-tag">Consultation: ${doctor.fee}</span>
+                            ${languagesHTML}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px;">About Doctor</h3>
+                    <p style="color: var(--gray); line-height: 1.6;">${doctor.description}</p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px;">Education & Qualifications</h3>
+                    <div class="detail-item">
+                        <strong>Medical Education</strong>
+                        <span>${doctor.education}</span>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px;">Weekly Schedule</h3>
+                    <div class="schedule-grid">
+                        ${scheduleHTML}
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 15px;">
+                    <button class="btn btn-primary" style="flex: 1;" onclick="bookAppointment('${doctor.name}')">
+                        <i class="fas fa-calendar-check"></i> Book Appointment
+                    </button>
+                    <button class="btn btn-outline" style="flex: 1;" onclick="openVideoConsult('${doctor.name}')">
+                        <i class="fas fa-video"></i> Video Consultation
+                    </button>
+                    <button class="btn" style="flex: 1; background: var(--gray-light); color: var(--dark);">
+                        <i class="fas fa-envelope"></i> Send Message
+                    </button>
+                </div>
+            `;
+            
+            // Update active state in list
+            document.querySelectorAll('.doctor-list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the clicked item
+            const items = document.querySelectorAll('.doctor-list-item');
+            for (let item of items) {
+                if (item.querySelector('strong').textContent === doctor.name) {
+                    item.classList.add('active');
+                    break;
+                }
+            }
+        }
+        
+        // Filter doctors in modal - FIXED FUNCTIONALITY
+        function filterModalDoctors(specialty) {
+            // Update active button
+            document.querySelectorAll('#doctorsModal .category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (!window.allDoctors) return;
+            
+            let filteredDoctors;
+            if (specialty === 'all') {
+                filteredDoctors = window.allDoctors;
+            } else {
+                filteredDoctors = window.allDoctors.filter(doctor => 
+                    doctor.specialty.toLowerCase().includes(specialty.toLowerCase())
+                );
+            }
+            
+            populateDoctorsList(filteredDoctors);
+        }
+        
+        // Search doctors in modal
+        function searchDoctors() {
+            const searchTerm = document.getElementById('doctorSearch').value.toLowerCase();
+            const doctorItems = document.querySelectorAll('#doctorsList .doctor-list-item');
+            
+            doctorItems.forEach(item => {
+                const doctorName = item.querySelector('strong').textContent.toLowerCase();
+                const specialty = item.querySelector('span').textContent.toLowerCase();
+                
+                if (doctorName.includes(searchTerm) || specialty.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // ==================== ENHANCED HEALTH TIPS FUNCTIONALITY ====================
+        
+        // Filter tips in main section - FIXED LAYOUT ISSUE
+        function filterTips(category) {
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show selected category
+            document.querySelectorAll('.tips-category-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            if (category === 'all') {
+                document.getElementById('tips-all').classList.add('active');
+            } else {
+                const section = document.getElementById('tips-' + category);
+                if (section) {
+                    section.classList.add('active');
+                } else {
+                    // If section doesn't exist, show all
+                    document.getElementById('tips-all').classList.add('active');
+                }
+            }
+        }
+        
+        // Open health tips modal
         function openHealthTipsModal() {
             document.getElementById('healthTipsModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Load sample tips data
+            loadTipsData();
         }
-
+        
         function closeHealthTipsModal() {
             document.getElementById('healthTipsModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
-
-        // Doctors directory functions
-        function bookConsultation(doctorId) {
-            alert(`Booking consultation with ${doctorId}. Would redirect to booking page.`);
-        }
-
-        function viewProfile(doctorId) {
-            alert(`Viewing profile of ${doctorId}. Would redirect to detailed profile page.`);
-        }
-
-        function loadMoreDoctors() {
-            alert('Loading more doctors... This would fetch additional doctor data from the server.');
-        }
-
-        // Health tips functions
-        function filterTips(category) {
-            const buttons = document.querySelectorAll('#healthTipsModal .category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        
+        // Load sample tips data
+        function loadTipsData() {
+            const tips = [
+                {
+                    id: 1,
+                    title: "Morning Routine for Energy",
+                    category: "lifestyle",
+                    icon: "fas fa-sun",
+                    content: "Start your day with these energy-boosting habits:",
+                    points: [
+                        "Drink warm water with lemon",
+                        "15 minutes of morning sunlight",
+                        "Light stretching or yoga",
+                        "Healthy protein-rich breakfast",
+                        "Plan your day ahead"
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Digital Eye Strain Prevention",
+                    category: "prevention",
+                    icon: "fas fa-desktop",
+                    content: "Protect your eyes during screen time:",
+                    points: [
+                        "Follow 20-20-20 rule (20 sec break every 20 min)",
+                        "Adjust screen brightness",
+                        "Use blue light filters",
+                        "Blink frequently",
+                        "Position screen at arm's length"
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Healthy Snack Alternatives",
+                    category: "diet",
+                    icon: "fas fa-carrot",
+                    content: "Swap unhealthy snacks with these options:",
+                    points: [
+                        "Fresh fruits instead of candy",
+                        "Nuts instead of chips",
+                        "Greek yogurt instead of ice cream",
+                        "Dark chocolate instead of milk chocolate",
+                        "Vegetable sticks with hummus"
+                    ]
+                },
+                {
+                    id: 4,
+                    title: "Posture Correction Exercises",
+                    category: "exercise",
+                    icon: "fas fa-user",
+                    content: "Improve posture with daily exercises:",
+                    points: [
+                        "Chin tucks (10 reps, 3 times daily)",
+                        "Shoulder blade squeezes",
+                        "Chest stretches",
+                        "Core strengthening",
+                        "Back extensions"
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "Mindful Eating Practices",
+                    category: "mental",
+                    icon: "fas fa-utensils",
+                    content: "Develop healthier eating habits:",
+                    points: [
+                        "Eat without distractions",
+                        "Chew food thoroughly",
+                        "Listen to hunger cues",
+                        "Appreciate food flavors",
+                        "Stop when 80% full"
+                    ]
+                },
+                {
+                    id: 6,
+                    title: "Home Workout Essentials",
+                    category: "fitness",
+                    icon: "fas fa-home",
+                    content: "Create effective home workout routine:",
+                    points: [
+                        "Bodyweight exercises",
+                        "Resistance bands",
+                        "Yoga mat for floor exercises",
+                        "Water bottle for hydration",
+                        "Music for motivation"
+                    ]
+                },
+                {
+                    id: 7,
+                    title: "Sleep Optimization Techniques",
+                    category: "lifestyle",
+                    icon: "fas fa-bed",
+                    content: "Improve sleep quality for better health:",
+                    points: [
+                        "Maintain consistent sleep schedule",
+                        "Create dark, cool sleeping environment",
+                        "Avoid caffeine after 2 PM",
+                        "Limit screen time 1 hour before bed",
+                        "Practice relaxation techniques"
+                    ]
+                },
+                {
+                    id: 8,
+                    title: "Immune System Boosters",
+                    category: "prevention",
+                    icon: "fas fa-shield-virus",
+                    content: "Natural ways to strengthen your immune system:",
+                    points: [
+                        "Get 7-9 hours of quality sleep",
+                        "Eat colorful fruits and vegetables",
+                        "Manage stress through meditation",
+                        "Exercise regularly",
+                        "Stay hydrated throughout the day"
+                    ]
+                },
+                {
+                    id: 9,
+                    title: "Stress Relief Breathing",
+                    category: "mental",
+                    icon: "fas fa-wind",
+                    content: "Simple breathing exercises for stress relief:",
+                    points: [
+                        "4-7-8 breathing technique",
+                        "Box breathing (4-4-4-4)",
+                        "Alternate nostril breathing",
+                        "Diaphragmatic breathing",
+                        "Morning breath awareness"
+                    ]
+                },
+                {
+                    id: 10,
+                    title: "Healthy Heart Habits",
+                    category: "diet",
+                    icon: "fas fa-heart",
+                    content: "Daily habits for cardiovascular health:",
+                    points: [
+                        "30 minutes of daily walking",
+                        "Reduce processed food intake",
+                        "Monitor blood pressure regularly",
+                        "Include omega-3 rich foods",
+                        "Manage cholesterol levels"
+                    ]
+                },
+                {
+                    id: 11,
+                    title: "Back Pain Prevention",
+                    category: "exercise",
+                    icon: "fas fa-spine",
+                    content: "Prevent and manage back pain:",
+                    points: [
+                        "Maintain proper posture while sitting",
+                        "Strengthen core muscles",
+                        "Lift with your legs, not back",
+                        "Use ergonomic chairs",
+                        "Regular stretching breaks"
+                    ]
+                },
+                {
+                    id: 12,
+                    title: "Brain Health Tips",
+                    category: "aging",
+                    icon: "fas fa-brain",
+                    content: "Keep your brain sharp and healthy:",
+                    points: [
+                        "Learn new skills regularly",
+                        "Social engagement",
+                        "Brain games and puzzles",
+                        "Adequate sleep for memory consolidation",
+                        "Mediterranean diet benefits"
+                    ]
+                }
+            ];
             
-            const tips = document.querySelectorAll('#healthTipsModal .tip-modal-card');
+            // Store tips globally for filtering
+            window.allTips = tips;
+            
+            // Populate tips grid
+            populateTipsGrid(tips);
+        }
+        
+        // Populate tips grid
+        function populateTipsGrid(tips) {
+            const tipsContent = document.getElementById('tipsModalContent');
+            tipsContent.innerHTML = '';
+            
             tips.forEach(tip => {
-                if (category === 'all' || tip.dataset.category === category) {
+                const tipCard = document.createElement('div');
+                tipCard.className = 'tip-card-expanded';
+                tipCard.setAttribute('data-category', tip.category);
+                tipCard.innerHTML = `
+                    <div class="tip-badge">${tip.category.charAt(0).toUpperCase() + tip.category.slice(1)}</div>
+                    <div class="tip-icon">
+                        <i class="${tip.icon}"></i>
+                    </div>
+                    <h3>${tip.title}</h3>
+                    <div class="tip-content">
+                        <p>${tip.content}</p>
+                        <ul class="tip-points">
+                            ${tip.points.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                tipsContent.appendChild(tipCard);
+            });
+        }
+        
+        // Search tips in modal
+        function searchTips() {
+            const searchTerm = document.getElementById('tipsSearch').value.toLowerCase();
+            const tips = document.querySelectorAll('#tipsModalContent .tip-card-expanded');
+            
+            tips.forEach(tip => {
+                const title = tip.querySelector('h3').textContent.toLowerCase();
+                const content = tip.querySelector('.tip-content').textContent.toLowerCase();
+                const category = tip.getAttribute('data-category');
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm) || category.includes(searchTerm)) {
                     tip.style.display = 'block';
                 } else {
                     tip.style.display = 'none';
                 }
             });
         }
-
-        function readFullTip(tipId) {
-            alert(`Opening full article: ${tipId}\n\nThis would redirect to a detailed article page with complete information.`);
+        
+        // Filter tips in modal
+        function filterModalTips(category) {
+            // Update active button
+            document.querySelectorAll('#healthTipsModal .category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (!window.allTips) return;
+            
+            let filteredTips;
+            if (category === 'all') {
+                filteredTips = window.allTips;
+            } else {
+                filteredTips = window.allTips.filter(tip => 
+                    tip.category.toLowerCase().includes(category.toLowerCase())
+                );
+            }
+            
+            populateTipsGrid(filteredTips);
         }
 
-        // Navigation functions
+        // ==================== ORIGINAL MAP FUNCTIONS ====================
+        
+        // Global variables
+        let map = null;
+        let markerCluster = null;
+        let userMarker = null;
+        let accuracyCircle = null;
+        let watchId = null;
+        let geocoder = null;
+        let currentFacilities = [];
+        let markersById = new Map();
+        const defaultCenter = [17.3850, 78.4867]; // Hyderabad center
+        
+        // Haversine distance calculation in meters
+        function distanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+            
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            
+            return R * c;
+        }
+        
+        // Fetch real facilities from OpenStreetMap Overpass API
+        async function fetchFacilitiesFromOverpass(lat, lon, radiusMeters = 5000) {
+            const query = `
+                [out:json][timeout:25];
+                (
+                    node(around:${radiusMeters},${lat},${lon})[amenity~"hospital|clinic|pharmacy|doctors|healthcare"];
+                    way(around:${radiusMeters},${lat},${lon})[amenity~"hospital|clinic|pharmacy|doctors|healthcare"];
+                    relation(around:${radiusMeters},${lat},${lon})[amenity~"hospital|clinic|pharmacy|doctors|healthcare"];
+                );
+                out center tags;
+            `;
+            
+            const endpoint = 'https://overpass-api.de/api/interpreter';
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: `data=${encodeURIComponent(query)}`,
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Overpass API error: ' + response.status);
+                }
+                
+                const data = await response.json();
+                
+                return data.elements.map(element => {
+                    const latitude = element.lat || (element.center && element.center.lat);
+                    const longitude = element.lon || (element.center && element.center.lon);
+                    
+                    if (!latitude || !longitude) return null;
+                    
+                    return {
+                        id: `${element.type}/${element.id}`,
+                        osmType: element.type,
+                        osmId: element.id,
+                        name: (element.tags && (element.tags.name || element.tags['name:en'])) || 'Unnamed Facility',
+                        tags: element.tags || {},
+                        lat: latitude,
+                        lon: longitude
+                    };
+                }).filter(Boolean);
+            } catch (error) {
+                console.error('Overpass fetch failed:', error);
+                throw error;
+            }
+        }
+        
+        // Classify facility from OSM tags
+        function classifyFacility(raw) {
+            const tags = raw.tags || {};
+            let type = (tags.amenity || '').toLowerCase();
+            
+            if (!type && tags.healthcare) {
+                type = tags.healthcare.toLowerCase();
+            }
+            
+            if (type.includes('hospital')) {
+                type = 'hospital';
+            } else if (type.includes('pharmacy')) {
+                type = 'pharmacy';
+            } else if (type.includes('clinic') || type.includes('doctor') || type.includes('doctors')) {
+                type = 'clinic';
+            } else if (type.includes('health')) {
+                type = 'clinic';
+            } else {
+                const name = (raw.name || '').toLowerCase();
+                if (name.includes('hospital')) {
+                    type = 'hospital';
+                } else if (name.includes('pharmacy') || name.includes('chemist')) {
+                    type = 'pharmacy';
+                } else {
+                    type = 'clinic';
+                }
+            }
+            
+            const specialtyKeywords = [
+                'cardio', 'cardiology', 'heart',
+                'neuro', 'neurology',
+                'ortho', 'orthopedics',
+                'pediatrics', 'pediatric',
+                'eye', 'ophthalmology',
+                'derma', 'dermatology',
+                'ent',
+                'psychiatry',
+                'dental', 'dentist',
+                'surgery', 'oncology'
+            ];
+            
+            const specialties = new Set();
+            const nameLower = (raw.name || '').toLowerCase();
+            
+            Object.values(tags).forEach(value => {
+                const val = String(value).toLowerCase();
+                specialtyKeywords.forEach(keyword => {
+                    if (val.includes(keyword)) specialties.add(keyword);
+                });
+            });
+            
+            specialtyKeywords.forEach(keyword => {
+                if (nameLower.includes(keyword)) specialties.add(keyword);
+            });
+            
+            const mappedSpecialties = Array.from(specialties).map(s => {
+                if (s.includes('cardio') || s.includes('heart')) return 'Cardiology';
+                if (s.includes('neuro')) return 'Neurology';
+                if (s.includes('ortho')) return 'Orthopedics';
+                if (s.includes('pediatr') || s.includes('child')) return 'Pediatrics';
+                if (s.includes('eye') || s.includes('ophthalmology')) return 'Eye Care';
+                if (s.includes('derma')) return 'Dermatology';
+                if (s.includes('ent')) return 'ENT';
+                if (s.includes('psychi')) return 'Psychiatry';
+                if (s.includes('dental') || s.includes('dentist')) return 'Dental';
+                if (s.includes('oncology')) return 'Oncology';
+                return s;
+            });
+            
+            const emergency = (
+                (tags.emergency && tags.emergency.toLowerCase() === 'yes') ||
+                (tags.emergency && tags.emergency.toLowerCase() === 'true') ||
+                (tags['service_times'] && tags['service_times'].toLowerCase().includes('emergency')) ||
+                (raw.name && raw.name.toLowerCase().includes('emergency')) ||
+                (tags.opening_hours && tags.opening_hours.toLowerCase().includes('24/7'))
+            );
+            
+            return {
+                id: raw.id,
+                name: raw.name,
+                type: type,
+                lat: raw.lat,
+                lon: raw.lon,
+                tags: raw.tags,
+                specialties: mappedSpecialties.length ? mappedSpecialties : ['General'],
+                emergency: !!emergency
+            };
+        }
+        
+        // Initialize map
+        function initMapIfNeeded() {
+            if (map) return;
+            
+            map = L.map('map', { preferCanvas: true }).setView(defaultCenter, 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+            
+            markerCluster = L.markerClusterGroup({
+                chunkedLoading: true,
+                showCoverageOnHover: false
+            });
+            map.addLayer(markerCluster);
+            
+            geocoder = L.Control.geocoder({
+                placeholder: 'Search place or address...',
+                defaultMarkGeocode: false
+            }).addTo(map);
+            
+            geocoder.on('markgeocode', async function(e) {
+                if (!e || !e.geocode) return;
+                const center = e.geocode.center;
+                map.setView(center, 14);
+                await loadNearbyFacilities(center.lat, center.lng, 
+                    parseInt(document.getElementById('distanceFilter').value || 5, 10) * 1000);
+            });
+            
+            L.control.scale({ imperial: false }).addTo(map);
+            
+            addMapControls();
+        }
+        
+        // Add custom map controls
+        function addMapControls() {
+            const zoomControl = L.control({ position: 'topleft' });
+            
+            zoomControl.onAdd = function(map) {
+                const div = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+                div.style.background = 'transparent';
+                div.style.boxShadow = 'none';
+                div.style.display = 'flex';
+                div.style.flexDirection = 'column';
+                div.style.gap = '8px';
+                
+                const zoomInBtn = L.DomUtil.create('button', 'map-control-btn', div);
+                zoomInBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                zoomInBtn.onclick = function() { map.zoomIn(); };
+                
+                const zoomOutBtn = L.DomUtil.create('button', 'map-control-btn', div);
+                zoomOutBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                zoomOutBtn.onclick = function() { map.zoomOut(); };
+                
+                const locationBtn = L.DomUtil.create('button', 'map-control-btn', div);
+                locationBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                locationBtn.style.color = 'var(--primary)';
+                locationBtn.onclick = centerOnUserLocation;
+                
+                return div;
+            };
+            
+            zoomControl.addTo(map);
+        }
+        
+        // Create marker for a facility
+        function createMarkerForFacility(facility) {
+            let color, iconClass;
+            switch(facility.type) {
+                case 'hospital':
+                    color = '#ef4444';
+                    iconClass = 'fas fa-hospital';
+                    break;
+                case 'pharmacy':
+                    color = '#10b981';
+                    iconClass = 'fas fa-pills';
+                    break;
+                case 'clinic':
+                case 'doctors':
+                    color = '#2563eb';
+                    iconClass = 'fas fa-clinic-medical';
+                    break;
+                default:
+                    color = '#64748b';
+                    iconClass = 'fas fa-building';
+            }
+            
+            const icon = L.divIcon({
+                html: `<div class="custom-marker" style="background: ${color};"><i class="${iconClass}"></i></div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40],
+                className: 'leaflet-medical-marker'
+            });
+            
+            const marker = L.marker([facility.lat, facility.lon], {
+                icon: icon,
+                title: facility.name
+            });
+            
+            const specialtiesText = (facility.specialties || []).join(', ');
+            const popupHTML = `
+                <div style="min-width: 250px;">
+                    <h4 style="margin: 0 0 6px; color: var(--dark); font-weight: 600;">${escapeHtml(facility.name)}</h4>
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                        <span style="background: ${color}; color: white; padding: 3px 8px; border-radius: 8px; font-size: 12px; text-transform: uppercase;">
+                            ${facility.type}
+                        </span>
+                        ${facility.emergency ? '<span style="background: #b91c1c; color: white; padding: 3px 8px; border-radius: 8px; font-size: 12px;">EMERGENCY</span>' : ''}
+                    </div>
+                    <div style="color: var(--gray); font-size: 13px; margin-bottom: 8px;">
+                        ${specialtiesText}
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="getDirectionsTo(${facility.lat}, ${facility.lon})" 
+                                style="flex: 1; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                        <button onclick="viewFacilityDetails('${facility.id}')" 
+                                style="flex: 1; padding: 8px; background: white; color: var(--primary); border: 1px solid var(--primary); border-radius: 6px; cursor: pointer; font-size: 13px;">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupHTML);
+            
+            marker.on('click', function() {
+                highlightResultInSidebar(facility.id);
+            });
+            
+            return marker;
+        }
+        
+        // Load nearby facilities
+        async function loadNearbyFacilities(lat, lon, radiusKm = 5) {
+            initMapIfNeeded();
+            
+            const loadingOverlay = document.getElementById('mapLoading');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            markerCluster.clearLayers();
+            markersById.clear();
+            currentFacilities = [];
+            
+            const radiusMeters = radiusKm * 1000;
+            
+            try {
+                const rawFacilities = await fetchFacilitiesFromOverpass(lat, lon, radiusMeters);
+                
+                let processedFacilities = rawFacilities.map(raw => {
+                    const facility = classifyFacility(raw);
+                    facility.distanceMeters = distanceMeters(lat, lon, facility.lat, facility.lon);
+                    facility.distanceKm = (facility.distanceMeters / 1000).toFixed(2);
+                    return facility;
+                });
+                
+                processedFacilities.sort((a, b) => a.distanceMeters - b.distanceMeters);
+                
+                currentFacilities = processedFacilities;
+                
+                if (currentFacilities.length === 0) {
+                    console.warn('No facilities found via Overpass, using fallback data');
+                    currentFacilities = getFallbackFacilities(lat, lon);
+                }
+                
+                currentFacilities.forEach(facility => {
+                    const marker = createMarkerForFacility(facility);
+                    markerCluster.addLayer(marker);
+                    markersById.set(facility.id, marker);
+                });
+                
+                updateResultsSidebar(currentFacilities);
+                
+                if (currentFacilities.length > 0) {
+                    const bounds = L.latLngBounds(currentFacilities.map(f => [f.lat, f.lon]));
+                    bounds.extend([lat, lon]);
+                    map.fitBounds(bounds.pad(0.2));
+                } else {
+                    map.setView([lat, lon], 13);
+                }
+                
+                populateFilterOptions();
+                
+            } catch (error) {
+                console.error('Error loading facilities:', error);
+                currentFacilities = getFallbackFacilities(lat, lon);
+                updateResultsSidebar(currentFacilities);
+                alert('Unable to fetch real-time data. Showing sample facilities.');
+            } finally {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+        }
+        
+        // Fallback facilities when Overpass fails
+        function getFallbackFacilities(lat, lon) {
+            const fallbacks = [];
+            const types = ['hospital', 'clinic', 'pharmacy', 'clinic'];
+            const names = [
+                'General Hospital',
+                'City Medical Clinic',
+                '24/7 Pharmacy',
+                'Specialist Care Center',
+                'Community Health Clinic'
+            ];
+            const specialties = ['General', 'Cardiology', 'Pediatrics', 'Dermatology', 'ENT'];
+            
+            for (let i = 0; i < 8; i++) {
+                const offsetLat = (Math.random() - 0.5) * 0.02;
+                const offsetLon = (Math.random() - 0.5) * 0.02;
+                const type = types[i % types.length];
+                
+                fallbacks.push({
+                    id: `fallback-${i}`,
+                    name: `${names[i % names.length]} ${i + 1}`,
+                    type: type,
+                    lat: lat + offsetLat,
+                    lon: lon + offsetLon,
+                    specialties: [specialties[i % specialties.length]],
+                    emergency: type === 'hospital' || Math.random() > 0.7,
+                    distanceMeters: distanceMeters(lat, lon, lat + offsetLat, lon + offsetLon),
+                    distanceKm: (distanceMeters(lat, lon, lat + offsetLat, lon + offsetLon) / 1000).toFixed(2)
+                });
+            }
+            
+            return fallbacks.sort((a, b) => a.distanceMeters - b.distanceMeters);
+        }
+        
+        // Update results sidebar
+        function updateResultsSidebar(facilities) {
+            const resultsList = document.getElementById('resultsList');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            if (!facilities || facilities.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h4 style="margin-bottom: 8px; color: var(--gray);">No facilities found</h4>
+                        <p style="font-size: 14px; color: var(--gray);">Try adjusting your filters or search in a different area.</p>
+                    </div>
+                `;
+                resultsCount.textContent = '(0 found)';
+                return;
+            }
+            
+            let html = '';
+            facilities.forEach(facility => {
+                let badgeColor;
+                switch(facility.type) {
+                    case 'hospital': badgeColor = '#ef4444'; break;
+                    case 'pharmacy': badgeColor = '#10b981'; break;
+                    case 'clinic': badgeColor = '#2563eb'; break;
+                    default: badgeColor = '#64748b';
+                }
+                
+                html += `
+                    <div class="result-card" id="result-${facility.id}" onclick="goToFacility('${facility.id}')">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="max-width: 70%;">
+                                <h4 style="font-size: 16px; color: var(--dark); font-weight: 500; margin: 0;">${escapeHtml(facility.name)}</h4>
+                                <div style="font-size: 13px; color: var(--gray); margin-top: 6px;">
+                                    ${(facility.specialties || []).slice(0, 2).join(', ')}
+                                </div>
+                            </div>
+                            <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; text-transform: uppercase;">
+                                ${facility.type}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 12px; font-size: 13px; color: var(--gray); margin-bottom: 12px; flex-wrap: wrap;">
+                            <span><i class="fas fa-ruler"></i> ${facility.distanceKm || 'N/A'} km</span>
+                            ${facility.emergency ? '<span style="color: var(--danger);"><i class="fas fa-ambulance"></i> Emergency</span>' : ''}
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-primary" style="flex: 1; padding: 8px 12px; font-size: 13px;" onclick="getDirectionsTo(${facility.lat}, ${facility.lon}); event.stopPropagation();">
+                                <i class="fas fa-directions"></i> Directions
+                            </button>
+                            <button class="btn btn-outline" style="flex: 1; padding: 8px 12px; font-size: 13px;" onclick="viewFacilityDetails('${facility.id}'); event.stopPropagation();">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsList.innerHTML = html;
+            resultsCount.textContent = `(${facilities.length} found)`;
+        }
+        
+        // Populate filter options based on available facilities
+        function populateFilterOptions() {
+            const specEl = document.getElementById('specializationFilter');
+            if (!specEl) return;
+            
+            const specialties = new Set();
+            currentFacilities.forEach(facility => {
+                (facility.specialties || []).forEach(s => specialties.add(s));
+            });
+            
+            while (specEl.options.length > 1) {
+                specEl.remove(1);
+            }
+            
+            Array.from(specialties).sort().forEach(specialty => {
+                const option = document.createElement('option');
+                option.value = specialty;
+                option.textContent = specialty;
+                specEl.appendChild(option);
+            });
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            const facilityType = document.getElementById('facilityType').value;
+            const specialty = document.getElementById('specializationFilter').value;
+            const distanceFilter = parseInt(document.getElementById('distanceFilter').value || 5, 10);
+            const availability = document.getElementById('availabilityFilter').value;
+            
+            let centerLat, centerLon;
+            if (userMarker) {
+                const pos = userMarker.getLatLng();
+                centerLat = pos.lat;
+                centerLon = pos.lng;
+            } else {
+                const center = map.getCenter();
+                centerLat = center.lat;
+                centerLon = center.lng;
+            }
+            
+            const filtered = currentFacilities.filter(facility => {
+                if (facilityType !== 'all' && facility.type !== facilityType) return false;
+                
+                if (specialty !== 'all' && !(facility.specialties || []).includes(specialty)) return false;
+                
+                const distanceKm = facility.distanceMeters ? facility.distanceMeters / 1000 : 
+                                  distanceMeters(centerLat, centerLon, facility.lat, facility.lon) / 1000;
+                if (distanceKm > distanceFilter) return false;
+                
+                if (availability === 'emergency' && !facility.emergency) return false;
+                
+                return true;
+            });
+            
+            markerCluster.clearLayers();
+            markersById.clear();
+            
+            filtered.forEach(facility => {
+                const marker = createMarkerForFacility(facility);
+                markerCluster.addLayer(marker);
+                markersById.set(facility.id, marker);
+            });
+            
+            updateResultsSidebar(filtered);
+            
+            if (filtered.length > 0) {
+                const bounds = L.latLngBounds(filtered.map(f => [f.lat, f.lon]));
+                if (userMarker) bounds.extend([centerLat, centerLon]);
+                map.fitBounds(bounds.pad(0.2));
+            }
+        }
+        
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('facilityType').value = 'all';
+            document.getElementById('specializationFilter').value = 'all';
+            document.getElementById('distanceFilter').value = '5';
+            document.getElementById('availabilityFilter').value = 'all';
+            
+            markerCluster.clearLayers();
+            markersById.clear();
+            
+            currentFacilities.forEach(facility => {
+                const marker = createMarkerForFacility(facility);
+                markerCluster.addLayer(marker);
+                markersById.set(facility.id, marker);
+            });
+            
+            updateResultsSidebar(currentFacilities);
+            
+            if (currentFacilities.length > 0) {
+                const bounds = L.latLngBounds(currentFacilities.map(f => [f.lat, f.lon]));
+                if (userMarker) {
+                    const pos = userMarker.getLatLng();
+                    bounds.extend([pos.lat, pos.lng]);
+                }
+                map.fitBounds(bounds.pad(0.2));
+            }
+        }
+        
+        // Center on user location
+        function centerOnUserLocation() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+            
+            const locBtn = document.querySelector('.btn-primary i.fa-location-arrow');
+            if (locBtn) locBtn.className = 'fas fa-spinner fa-spin';
+            
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    
+                    initMapIfNeeded();
+                    
+                    if (userMarker) map.removeLayer(userMarker);
+                    if (accuracyCircle) map.removeLayer(accuracyCircle);
+                    
+                    accuracyCircle = L.circle([lat, lon], {
+                        radius: accuracy,
+                        fillColor: '#2563eb',
+                        color: '#2563eb',
+                        weight: 2,
+                        opacity: 0.5,
+                        fillOpacity: 0.2,
+                        className: 'location-accuracy'
+                    }).addTo(map);
+                    
+                    userMarker = L.marker([lat, lon], {
+                        icon: L.divIcon({
+                            html: '<div class="custom-marker" style="background: var(--primary);"><i class="fas fa-user"></i></div>',
+                            iconSize: [40, 40],
+                            className: 'leaflet-user-marker'
+                        }),
+                        zIndexOffset: 1000
+                    }).addTo(map);
+                    
+                    userMarker.bindPopup('<b>Your Location</b><br>Accuracy: ' + Math.round(accuracy) + ' meters').openPopup();
+                    
+                    map.setView([lat, lon], 14);
+                    
+                    await loadNearbyFacilities(lat, lon, 
+                        parseInt(document.getElementById('distanceFilter').value || 5, 10));
+                    
+                    if (locBtn) locBtn.className = 'fas fa-location-arrow';
+                    
+                    startWatchingPosition();
+                },
+                function(error) {
+                    let errorMsg = "Unable to get your location. ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = "Location permission denied. Please enable location access in your browser settings.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = "Location information unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = "Location request timed out.";
+                            break;
+                        default:
+                            errorMsg = "An unknown error occurred.";
+                    }
+                    
+                    alert(errorMsg);
+                    
+                    if (locBtn) locBtn.className = 'fas fa-location-arrow';
+                    
+                    initMapIfNeeded();
+                    map.setView(defaultCenter, 13);
+                    loadNearbyFacilities(defaultCenter[0], defaultCenter[1], 5);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        // Start watching position
+        function startWatchingPosition() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            
+            watchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    
+                    if (userMarker) {
+                        userMarker.setLatLng([lat, lon]);
+                    }
+                    
+                    if (accuracyCircle) {
+                        accuracyCircle.setLatLng([lat, lon]);
+                        accuracyCircle.setRadius(accuracy);
+                    }
+                },
+                function(error) {
+                    console.warn('Error watching position:', error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 30000,
+                    timeout: 10000
+                }
+            );
+        }
+        
+        // Highlight facility in sidebar
+        function highlightResultInSidebar(id) {
+            document.querySelectorAll('.result-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const selectedCard = document.getElementById(`result-${id}`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+                selectedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        
+        // Go to facility (zoom and open popup)
+        function goToFacility(id) {
+            const facility = currentFacilities.find(f => f.id === id);
+            if (!facility) return;
+            
+            const marker = markersById.get(id);
+            if (marker) {
+                map.setView([facility.lat, facility.lon], 16, { animate: true });
+                setTimeout(() => { marker.openPopup(); }, 300);
+            }
+            
+            highlightResultInSidebar(id);
+        }
+        
+        // Get directions to facility
+        function getDirectionsTo(lat, lon) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+            window.open(url, '_blank');
+        }
+        
+        // View facility details
+        function viewFacilityDetails(id) {
+            const facility = currentFacilities.find(f => f.id === id);
+            if (facility) {
+                const details = `
+                    <strong>${escapeHtml(facility.name)}</strong><br>
+                    Type: ${facility.type}<br>
+                    Specialties: ${(facility.specialties || []).join(', ')}<br>
+                    Emergency Services: ${facility.emergency ? 'Yes' : 'No'}<br>
+                    Distance: ${facility.distanceKm || 'N/A'} km<br>
+                    Location: ${facility.lat.toFixed(5)}, ${facility.lon.toFixed(5)}
+                `;
+                alert(details);
+            }
+        }
+        
+        // Toggle filter panel
+        function toggleFilterPanel() {
+            const panel = document.getElementById('filterPanel');
+            const button = document.getElementById('filterToggleBtn');
+            
+            panel.classList.toggle('expanded');
+            
+            if (panel.classList.contains('expanded')) {
+                button.innerHTML = '<i class="fas fa-times"></i> Close Filters';
+                button.classList.add('btn-primary');
+                button.style.background = '';
+                button.style.color = 'white';
+            } else {
+                button.innerHTML = '<i class="fas fa-filter"></i> Filters';
+                button.classList.remove('btn-primary');
+                button.style.background = 'var(--gray-light)';
+                button.style.color = 'var(--dark)';
+            }
+            
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 300);
+        }
+        
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ==================== MODAL FUNCTIONS ====================
+        
+        function openMapFeature() {
+            document.getElementById('mapModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                initMapIfNeeded();
+                loadNearbyFacilities(defaultCenter[0], defaultCenter[1], 5);
+            }, 100);
+        }
+        
+        function closeMapModal() {
+            document.getElementById('mapModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            
+            const panel = document.getElementById('filterPanel');
+            const button = document.getElementById('filterToggleBtn');
+            panel.classList.remove('expanded');
+            if (button) {
+                button.innerHTML = '<i class="fas fa-filter"></i> Filters';
+                button.classList.remove('btn-primary');
+                button.style.background = 'var(--gray-light)';
+                button.style.color = 'var(--dark)';
+            }
+        }
+        
+        // ==================== OTHER FUNCTIONS ====================
+        
+        function openSymptomChecker() {
+            window.open('https://symptompredict.streamlit.app/', '_blank');
+            
+        }
+        
+        function openPrescriptionReader() {
+            window.open('https://prescriptionreader.streamlit.app/', '_blank');
+        }
+        
+        function callEmergency() {
+            if (confirm('In a real emergency, please call 108 (India) or 911 immediately.\n\nFor demonstration: Show emergency resources?')) {
+                alert('Emergency resources page would open. Remember: Always call emergency services for real emergencies.');
+            }
+        }
+        
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
+        
         function scrollToSection(sectionId) {
             const section = document.getElementById(sectionId);
             if (section) {
-                section.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        // Login/Signup buttons
-        document.querySelector('.btn-login').addEventListener('click', function() {
-            alert('Login page would open here.');
-        });
-
-        document.querySelector('.auth-buttons .btn-primary').addEventListener('click', function() {
-            alert('Signup page would open here.');
-        });
-
-        // Close modals on ESC key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeDoctorsModal();
-                closeHealthTipsModal();
-            }
-        });
-
-        // Close modals when clicking outside
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', function(event) {
-                if (event.target === this) {
-                    if (this.id === 'doctorsModal') closeDoctorsModal();
-                    if (this.id === 'healthTipsModal') closeHealthTipsModal();
-                }
-            });
-        });
-
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            if (window.scrollY > 50) {
-                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-            } else {
-                header.style.boxShadow = 'none';
-            }
-        });
-
-        // Initialize filter functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('.search-input');
-            const specialtySelect = document.querySelectorAll('.filter-select')[0];
-            const availabilitySelect = document.querySelectorAll('.filter-select')[1];
-
-            function applyFilters() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const specialty = specialtySelect.value;
-                const availability = availabilitySelect.value;
+                const headerOffset = 80;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                 
-                console.log(`Applying filters: Search=${searchTerm}, Specialty=${specialty}, Availability=${availability}`);
-                // In real app, this would filter the doctor cards
-            }
-
-            if (searchInput) {
-                let searchTimeout;
-                searchInput.addEventListener('input', () => {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(applyFilters, 500);
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
                 });
             }
-
-            if (specialtySelect) {
-                specialtySelect.addEventListener('change', applyFilters);
-            }
-
-            if (availabilitySelect) {
-                availabilitySelect.addEventListener('change', applyFilters);
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login/Signup buttons
+            document.querySelector('.btn-login').addEventListener('click', function() {
+                alert('Login page would open here.');
+            });
+        
+            document.querySelector('.auth-buttons .btn-primary').addEventListener('click', function() {
+                alert('Signup page would open here.');
+            });
+        
+            // Close modals on ESC key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeMapModal();
+                    closeDoctorsModal();
+                    closeHealthTipsModal();
+                }
+            });
+        
+            // Close map modal when clicking outside
+            document.getElementById('mapModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeMapModal();
+                }
+            });
+            
+            document.getElementById('doctorsModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeDoctorsModal();
+                }
+            });
+            
+            document.getElementById('healthTipsModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeHealthTipsModal();
+                }
+            });
+        
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.boxShadow = 'none';
+                }
+            });
+        
+            // Search input enter key - geocode search
+            document.getElementById('locationSearch').addEventListener('keypress', async function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const query = this.value.trim();
+                    if (!query) return;
+                    
+                    initMapIfNeeded();
+                    
+                    try {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+                            { headers: { 'Accept': 'application/json' } }
+                        );
+                        
+                        const results = await response.json();
+                        
+                        if (results && results.length > 0) {
+                            const result = results[0];
+                            const lat = parseFloat(result.lat);
+                            const lon = parseFloat(result.lon);
+                            
+                            map.setView([lat, lon], 14);
+                            
+                            L.marker([lat, lon]).addTo(map)
+                                .bindPopup(result.display_name)
+                                .openPopup();
+                            
+                            await loadNearbyFacilities(lat, lon, 
+                                parseInt(document.getElementById('distanceFilter').value || 5, 10));
+                        } else {
+                            alert('No results found for "' + query + '".');
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        alert('Search failed. Please try again.');
+                    }
+                }
+            });
+            
+            // Filter change events (with debounce)
+            let filterDebounce;
+            ['facilityType', 'specializationFilter', 'distanceFilter', 'availabilityFilter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', () => {
+                        clearTimeout(filterDebounce);
+                        filterDebounce = setTimeout(() => applyFilters(), 250);
+                    });
+                }
+            });
+            
+            // Initialize data
+            loadTipsData();
+        });
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
             }
         });
     </script>
